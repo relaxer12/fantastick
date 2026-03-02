@@ -3,28 +3,22 @@ import type { PrintSize, PrintFormat, FrameColor } from './pricing';
 const LUMAPRINTS_BASE = 'https://us.api.lumaprints.com';
 const STORE_ID = 82920;
 
+// ─── Verified subcategoryIds from live catalog (2026-03-02) ──────────────────
+// Print Only
+const SUBCATEGORY_ARCHIVAL_MATTE = 103001; // Archival Matte Fine Art Paper
+
+// Framed — each frame color is its own subcategory (max 60×40" each)
+const SUBCATEGORY_BLACK_FRAME   = 105005; // 1.25w x 0.875h Black Frame
+const SUBCATEGORY_MAPLE_FRAME   = 105022; // 1.25w x 0.875h Maple Wood Frame
+const SUBCATEGORY_ESPRESSO_FRAME = 105012; // 0.875w x 1.125h Espresso Frame
 // ─────────────────────────────────────────────────────────────────────────────
-// IMPORTANT: These IDs must be verified via the Lumaprints catalog API once
-// your account's payment method and billing address are configured.
-// Call GET /api/v1/products/categories to list categories,
-// then GET /api/v1/products/categories/{id}/subcategories for subcategoryIds,
-// then GET /api/v1/products/categories/{id}/subcategories/{id}/options for option IDs.
-// ─────────────────────────────────────────────────────────────────────────────
 
-// subcategoryId for unframed fine art paper (archival matte) — VERIFY
-const SUBCATEGORY_FINE_ART_PAPER = 103001;
-
-// subcategoryId for 1.25" framed fine art paper — VERIFY
-const SUBCATEGORY_FRAMED_FINE_ART = 103002;
-
-// orderItemOption IDs for frame colors — VERIFY these numeric IDs
-const FRAME_OPTION_IDS: Record<FrameColor, number> = {
-  black: 11,
-  maple: 23,
-  espresso: 51,
+const framedSubcategoryMap: Record<FrameColor, number> = {
+  black:    SUBCATEGORY_BLACK_FRAME,
+  maple:    SUBCATEGORY_MAPLE_FRAME,
+  espresso: SUBCATEGORY_ESPRESSO_FRAME,
 };
 
-// Size dimensions in inches
 const sizeDimensions: Record<PrintSize, { width: number; height: number }> = {
   '4x6':   { width: 4,  height: 6 },
   '5x7':   { width: 5,  height: 7 },
@@ -56,8 +50,7 @@ function getAuthHeader(): string {
   if (!apiKey || !apiSecret) {
     throw new Error('LUMAPRINTS_API_KEY and LUMAPRINTS_API_SECRET must be set');
   }
-  const encoded = Buffer.from(`${apiKey}:${apiSecret}`).toString('base64');
-  return `Basic ${encoded}`;
+  return `Basic ${Buffer.from(`${apiKey}:${apiSecret}`).toString('base64')}`;
 }
 
 export async function createLumaprintsOrder(
@@ -69,15 +62,13 @@ export async function createLumaprintsOrder(
   shipping: ShippingAddress
 ): Promise<LumaprintsOrderResponse> {
   const { width, height } = sizeDimensions[size];
-  const subcategoryId = format === 'framed' ? SUBCATEGORY_FRAMED_FINE_ART : SUBCATEGORY_FINE_ART_PAPER;
 
-  // Build orderItemOptions — only add frame option for framed prints
-  const orderItemOptions: number[] = [];
-  if (format === 'framed' && frameColor) {
-    orderItemOptions.push(FRAME_OPTION_IDS[frameColor]);
-  }
+  const subcategoryId =
+    format === 'framed' && frameColor
+      ? framedSubcategoryMap[frameColor]
+      : SUBCATEGORY_ARCHIVAL_MATTE;
 
-  // Split name into first/last (Stripe gives us full name)
+  // Split full name into first / last
   const nameParts = shipping.name.trim().split(' ');
   const firstName = nameParts[0] || 'Customer';
   const lastName = nameParts.slice(1).join(' ') || '.';
@@ -108,7 +99,6 @@ export async function createLumaprintsOrder(
         file: {
           imageUrl: photoUrl,
         },
-        ...(orderItemOptions.length > 0 ? { orderItemOptions } : {}),
         solidColorHexCode: null,
       },
     ],
@@ -132,11 +122,11 @@ export async function createLumaprintsOrder(
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Helper: call this once to discover subcategoryIds and option IDs
-// after your Lumaprints account payment/billing is configured.
+// Catalog discovery — used by /api/lumaprints-catalog
 // ─────────────────────────────────────────────────────────────────────────────
 export async function fetchLumaprintsCatalog() {
   const auth = getAuthHeader();
+
   const cats = await fetch(`${LUMAPRINTS_BASE}/api/v1/products/categories`, {
     headers: { Authorization: auth },
   }).then((r) => r.json());
