@@ -76,12 +76,11 @@ export default function Lightbox({ photo, onClose, onBuyPrints }: LightboxProps)
           />
         </div>
 
-        {/* Hover overlay with Prints button */}
-        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none group-hover:pointer-events-auto">
-          <div className="absolute inset-0 bg-black/20" />
+        {/* Hover overlay — button anchored to bottom-right, out of the way */}
+        <div className="absolute inset-0 flex items-end justify-end p-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none group-hover:pointer-events-auto">
           <button
             onClick={handlePrints}
-            className="relative z-10 border border-white text-white text-xs tracking-[0.3em] uppercase px-8 py-3.5 hover:bg-white hover:text-black transition-all duration-200 backdrop-blur-sm"
+            className="border border-white/60 text-white/80 text-xs tracking-[0.25em] uppercase px-6 py-2.5 hover:border-white hover:text-white hover:bg-white/10 transition-all duration-200 backdrop-blur-sm"
           >
             Order a Print
           </button>
