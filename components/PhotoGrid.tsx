@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import type { Photo } from '@/data/photos';
+import Lightbox from './Lightbox';
 import PhotoDrawer from './PhotoDrawer';
 
 interface PhotoGridProps {
@@ -10,17 +11,36 @@ interface PhotoGridProps {
 }
 
 export default function PhotoGrid({ photos }: PhotoGridProps) {
-  const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
+  const [lightboxPhoto, setLightboxPhoto] = useState<Photo | null>(null);
+  const [drawerPhoto, setDrawerPhoto] = useState<Photo | null>(null);
+
+  const handlePhotoClick = (photo: Photo) => {
+    setLightboxPhoto(photo);
+  };
+
+  const handleOrderPrints = () => {
+    // Move from lightbox to drawer
+    setDrawerPhoto(lightboxPhoto);
+    setLightboxPhoto(null);
+  };
+
+  const handleLightboxClose = () => {
+    setLightboxPhoto(null);
+  };
+
+  const handleDrawerClose = () => {
+    setDrawerPhoto(null);
+  };
 
   return (
     <>
-      {/* Masonry grid using CSS columns */}
+      {/* Masonry grid */}
       <div className="columns-1 sm:columns-2 lg:columns-3 gap-3 space-y-3">
         {photos.map((photo) => (
           <div
             key={photo.id}
             className="break-inside-avoid cursor-pointer group relative overflow-hidden"
-            onClick={() => setSelectedPhoto(photo)}
+            onClick={() => handlePhotoClick(photo)}
           >
             <div
               className="relative w-full overflow-hidden bg-[#111]"
@@ -34,10 +54,10 @@ export default function PhotoGrid({ photos }: PhotoGridProps) {
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
               />
               {/* Hover overlay */}
-              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-end">
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-300 flex items-end">
                 <div className="p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <p className="text-sm font-[family-name:var(--font-playfair)] text-white">{photo.title}</p>
-                  <p className="text-[10px] tracking-widest uppercase text-white/60 mt-1">Order Print</p>
+                  <p className="text-[10px] tracking-widest uppercase text-white/50 mt-1">View</p>
                 </div>
               </div>
             </div>
@@ -45,9 +65,17 @@ export default function PhotoGrid({ photos }: PhotoGridProps) {
         ))}
       </div>
 
+      {/* Lightbox — full screen photo view */}
+      <Lightbox
+        photo={lightboxPhoto}
+        onClose={handleLightboxClose}
+        onBuyPrints={handleOrderPrints}
+      />
+
+      {/* Drawer — purchase flow */}
       <PhotoDrawer
-        photo={selectedPhoto}
-        onClose={() => setSelectedPhoto(null)}
+        photo={drawerPhoto}
+        onClose={handleDrawerClose}
       />
     </>
   );
