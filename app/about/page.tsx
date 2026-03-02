@@ -29,16 +29,16 @@ export default function AboutPage() {
 
           <div className="space-y-5 text-white/70 leading-relaxed text-sm">
             <p>
-              I&apos;m a fine art photographer based in New York, drawn to the quiet spaces between moments — the light before it shifts, the stillness inside motion, the human trace left on empty landscapes.
+              I&apos;m a photographer based in New York, drawn to scenes that hold more than they show — a street corner gone quiet, light falling across a face, architecture that makes you feel small in exactly the right way.
             </p>
             <p>
-              My work spans landscapes, urban environments, and portraiture. Each image is an attempt to isolate a feeling — not a place or a person, but something harder to name.
+              I&apos;ve been making photographs for twenty years, starting with a Canon my dad handed me in high school. That camera taught me to slow down and look. I&apos;m still doing the same thing.
             </p>
             <p>
-              All prints are produced on archival matte paper using Giclée printing, with a 100-year color guarantee. Framed prints come in solid wood frames: black, maple, or espresso.
+              My work moves across landscapes, streets, cities, and people. The subject changes; the question stays the same — what is this moment trying to say, and can I hold still long enough to hear it?
             </p>
             <p>
-              Every order is fulfilled and shipped by Lumaprints, a professional fine art print lab. Prints are carefully packaged and shipped directly to you.
+              Prints are produced on archival matte paper with a 100-year color guarantee. Every order is fulfilled by Lumaprints, a professional fine art print lab, and shipped directly to you.
             </p>
           </div>
 
@@ -57,7 +57,7 @@ export default function AboutPage() {
               href="/gallery"
               className="inline-block border border-white/30 text-white/60 hover:border-white hover:text-white text-xs tracking-[0.25em] uppercase px-6 py-3 transition-all"
             >
-              View Gallery
+              View Portfolio
             </Link>
           </div>
         </div>
