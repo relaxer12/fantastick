@@ -1,4 +1,5 @@
-import type { PrintSize, PrintFormat, FrameColor } from './pricing';
+import type { PrintSize, PrintFormat, FrameColor, MatSize } from './pricing';
+import { matSizeOptionIds } from './pricing';
 
 const LUMAPRINTS_BASE = 'https://us.api.lumaprints.com';
 const STORE_ID = 82920;
@@ -59,6 +60,7 @@ export async function createLumaprintsOrder(
   size: PrintSize,
   format: PrintFormat,
   frameColor: FrameColor | undefined,
+  matSize: MatSize | undefined,
   shipping: ShippingAddress
 ): Promise<LumaprintsOrderResponse> {
   const { width, height } = sizeDimensions[size];
@@ -100,6 +102,18 @@ export async function createLumaprintsOrder(
           imageUrl: photoUrl,
         },
         solidColorHexCode: null,
+        // orderItemOptions — only relevant for framed prints
+        ...(format === 'framed' ? {
+          orderItemOptions: [
+            74,  // Paper Type: Archival Matte Fine Art Paper
+            matSizeOptionIds[matSize ?? 'none'], // Mat Size (default: No Mat)
+            96,  // Mat Color: White (only used when mat size > none)
+            83,  // Hanging Hardware: Hanging Wire
+            95,  // Backing: Kraft Paper
+            146, // Glazing: Acrylic Glass (recommended)
+            149, // Print Mounting: Loose Mounted
+          ],
+        } : {}),
       },
     ],
   };

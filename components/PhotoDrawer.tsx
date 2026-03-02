@@ -8,11 +8,14 @@ import {
   printSizeLabels,
   frameColors,
   frameColorLabels,
+  matSizes,
+  matSizeLabels,
   getPrice,
   SHIPPING_PRICE,
   type PrintSize,
   type PrintFormat,
   type FrameColor,
+  type MatSize,
 } from '@/lib/pricing';
 
 interface PhotoDrawerProps {
@@ -24,6 +27,7 @@ export default function PhotoDrawer({ photo, onClose }: PhotoDrawerProps) {
   const [size, setSize] = useState<PrintSize>('8x10');
   const [format, setFormat] = useState<PrintFormat>('print');
   const [frameColor, setFrameColor] = useState<FrameColor>('black');
+  const [matSize, setMatSize] = useState<MatSize>('none');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -33,6 +37,7 @@ export default function PhotoDrawer({ photo, onClose }: PhotoDrawerProps) {
       setSize('8x10');
       setFormat('print');
       setFrameColor('black');
+      setMatSize('none');
       setError(null);
     }
   }, [photo]);
@@ -56,7 +61,9 @@ export default function PhotoDrawer({ photo, onClose }: PhotoDrawerProps) {
     return () => { document.body.style.overflow = ''; };
   }, [photo]);
 
-  const price = photo ? getPrice(size, format, format === 'framed' ? frameColor : undefined) : 0;
+  const price = photo
+    ? getPrice(size, format, format === 'framed' ? frameColor : undefined, format === 'framed' ? matSize : undefined)
+    : 0;
 
   const handleBuyNow = useCallback(async () => {
     if (!photo) return;
@@ -74,6 +81,7 @@ export default function PhotoDrawer({ photo, onClose }: PhotoDrawerProps) {
           size,
           format,
           frameColor: format === 'framed' ? frameColor : undefined,
+          matSize: format === 'framed' ? matSize : undefined,
         }),
       });
 
@@ -209,14 +217,47 @@ export default function PhotoDrawer({ photo, onClose }: PhotoDrawerProps) {
             </div>
           )}
 
+          {/* Mat size selector — only when framed */}
+          {format === 'framed' && (
+            <div>
+              <label className="text-[10px] tracking-widest uppercase text-white/40 block mb-3">Mat</label>
+              <div className="grid grid-cols-3 gap-2">
+                {matSizes.map((m) => (
+                  <button
+                    key={m}
+                    onClick={() => setMatSize(m)}
+                    className={`py-2 text-xs border transition-all ${
+                      matSize === m
+                        ? 'border-white text-white bg-white/10'
+                        : 'border-[#333] text-white/50 hover:border-white/50 hover:text-white/80'
+                    }`}
+                  >
+                    {matSizeLabels[m]}
+                    {m !== 'none' && (
+                      <span className="block text-[9px] text-white/30 mt-0.5">+${[15,18,22,25,28][['1.0','1.5','2.0','2.5','3.0'].indexOf(m)]}</span>
+                    )}
+                  </button>
+                ))}
+              </div>
+              <p className="text-[10px] text-white/25 mt-2 tracking-wide">White archival mat board</p>
+            </div>
+          )}
+
           {/* Price summary */}
           <div className="border-t border-[#2a2a2a] pt-4">
             <div className="flex justify-between items-center mb-2">
               <span className="text-xs text-white/40 tracking-widest uppercase">
                 {printSizeLabels[size]} {format === 'framed' ? 'Framed Print' : 'Print'}
+                {format === 'framed' ? ` · ${frameColorLabels[frameColor]}` : ''}
               </span>
               <span className="text-sm">${price}</span>
             </div>
+            {format === 'framed' && matSize !== 'none' && (
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-xs text-white/40 tracking-widest uppercase">{matSizeLabels[matSize]} · White</span>
+                <span className="text-sm text-white/50">incl.</span>
+              </div>
+            )}
             <div className="flex justify-between items-center mb-4">
               <span className="text-xs text-white/40 tracking-widest uppercase">Shipping</span>
               <span className="text-sm">${SHIPPING_PRICE}</span>

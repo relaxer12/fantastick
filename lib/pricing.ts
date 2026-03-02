@@ -1,8 +1,29 @@
 export type PrintSize = '4x6' | '5x7' | '8x10' | '11x14' | '12x16' | '16x20' | '16x24';
 export type PrintFormat = 'print' | 'framed';
 export type FrameColor = 'black' | 'maple' | 'espresso';
+export type MatSize = 'none' | '1.0' | '1.5' | '2.0' | '2.5' | '3.0';
 
 export const printSizes: PrintSize[] = ['4x6', '5x7', '8x10', '11x14', '12x16', '16x20', '16x24'];
+export const matSizes: MatSize[] = ['none', '1.0', '1.5', '2.0', '2.5', '3.0'];
+
+export const matSizeLabels: Record<MatSize, string> = {
+  none:  'No Mat',
+  '1.0': '1″ Mat',
+  '1.5': '1.5″ Mat',
+  '2.0': '2″ Mat',
+  '2.5': '2.5″ Mat',
+  '3.0': '3″ Mat',
+};
+
+// Lumaprints optionId for each mat size (same across all frame subcategories)
+export const matSizeOptionIds: Record<MatSize, number> = {
+  none:  64,
+  '1.0': 65,
+  '1.5': 66,
+  '2.0': 67,
+  '2.5': 68,
+  '3.0': 69,
+};
 
 export const printSizeLabels: Record<PrintSize, string> = {
   '4x6': '4 × 6"',
@@ -40,12 +61,29 @@ const frameAddonPrices: Record<FrameColor, number> = {
   espresso: 60,
 };
 
+// Mat add-on prices (on top of frame price)
+const matAddonPrices: Record<MatSize, number> = {
+  none:  0,
+  '1.0': 15,
+  '1.5': 18,
+  '2.0': 22,
+  '2.5': 25,
+  '3.0': 28,
+};
+
 export const SHIPPING_PRICE = 12;
 
-export function getPrice(size: PrintSize, format: PrintFormat, frameColor?: FrameColor): number {
+export function getPrice(
+  size: PrintSize,
+  format: PrintFormat,
+  frameColor?: FrameColor,
+  matSize?: MatSize
+): number {
   const base = printPrices[size];
   if (format === 'framed' && frameColor) {
-    return base + frameAddonPrices[frameColor];
+    const frameAddon = frameAddonPrices[frameColor];
+    const matAddon = matSize ? matAddonPrices[matSize] : 0;
+    return base + frameAddon + matAddon;
   }
   return base;
 }
@@ -54,8 +92,13 @@ export function formatPrice(cents: number): string {
   return `$${(cents / 100).toFixed(0)}`;
 }
 
-export function getPriceInCents(size: PrintSize, format: PrintFormat, frameColor?: FrameColor): number {
-  return getPrice(size, format, frameColor) * 100;
+export function getPriceInCents(
+  size: PrintSize,
+  format: PrintFormat,
+  frameColor?: FrameColor,
+  matSize?: MatSize
+): number {
+  return getPrice(size, format, frameColor, matSize) * 100;
 }
 
 export function getShippingInCents(): number {

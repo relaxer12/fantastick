@@ -1,30 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe';
-import { getPriceInCents, getShippingInCents, printSizeLabels, frameColorLabels } from '@/lib/pricing';
-import type { PrintSize, PrintFormat, FrameColor } from '@/lib/pricing';
+import { getPriceInCents, getShippingInCents, printSizeLabels, frameColorLabels, matSizeLabels } from '@/lib/pricing';
+import type { PrintSize, PrintFormat, FrameColor, MatSize } from '@/lib/pricing';
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { photoId, photoTitle, photoSrc, size, format, frameColor } = body as {
+    const { photoId, photoTitle, photoSrc, size, format, frameColor, matSize } = body as {
       photoId: string;
       photoTitle: string;
       photoSrc: string;
       size: PrintSize;
       format: PrintFormat;
       frameColor?: FrameColor;
+      matSize?: MatSize;
     };
 
     if (!photoId || !size || !format) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    const printAmountCents = getPriceInCents(size, format, frameColor);
+    const printAmountCents = getPriceInCents(size, format, frameColor, matSize);
     const shippingCents = getShippingInCents();
 
     const sizeLabel = printSizeLabels[size];
     const frameLabel = format === 'framed' && frameColor ? ` — ${frameColorLabels[frameColor]} Frame` : '';
-    const productName = `${photoTitle} · ${sizeLabel} ${format === 'framed' ? 'Framed Print' : 'Print'}${frameLabel}`;
+    const matLabel = format === 'framed' && matSize && matSize !== 'none' ? ` + ${matSizeLabels[matSize]}` : '';
+    const productName = `${photoTitle} · ${sizeLabel} ${format === 'framed' ? 'Framed Print' : 'Print'}${frameLabel}${matLabel}`;
 
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
@@ -64,6 +66,7 @@ export async function POST(req: NextRequest) {
         size,
         format,
         frameColor: frameColor || '',
+        matSize: matSize || 'none',
       },
       success_url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://fantastick.work'}/shop/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://fantastick.work'}/shop/cancel`,

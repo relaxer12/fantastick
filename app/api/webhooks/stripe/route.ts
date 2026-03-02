@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe';
 import { createLumaprintsOrder } from '@/lib/lumaprints';
-import type { PrintSize, PrintFormat, FrameColor } from '@/lib/pricing';
+import type { PrintSize, PrintFormat, FrameColor, MatSize } from '@/lib/pricing';
 import type Stripe from 'stripe';
 
 export async function POST(req: NextRequest) {
@@ -28,13 +28,14 @@ export async function POST(req: NextRequest) {
     const session = event.data.object as Stripe.Checkout.Session;
 
     try {
-      const { photoTitle, photoSrc, size, format, frameColor } = session.metadata as {
+      const { photoTitle, photoSrc, size, format, frameColor, matSize } = session.metadata as {
         photoId: string;
         photoTitle: string;
         photoSrc: string;
         size: PrintSize;
         format: PrintFormat;
         frameColor: string;
+        matSize: string;
       };
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -61,6 +62,7 @@ export async function POST(req: NextRequest) {
         size,
         format,
         frameColor ? (frameColor as FrameColor) : undefined,
+        (matSize && matSize !== 'none') ? (matSize as MatSize) : undefined,
         shippingAddress
       );
 
