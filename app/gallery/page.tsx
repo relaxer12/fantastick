@@ -13,7 +13,7 @@ export default function GalleryPage() {
     <div className="min-h-screen pt-24 pb-16 px-6 md:px-12">
       <header className="mb-12 md:mb-16">
         <h2 className="font-[family-name:var(--font-playfair)] text-4xl md:text-5xl mb-3">
-          Gallery
+          Portfolio
         </h2>
         <p className="text-sm tracking-widest uppercase text-white/40">
           Select a collection

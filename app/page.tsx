@@ -25,7 +25,7 @@ export default function HomePage() {
       {/* Overlay content */}
       <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-6">
         <h1 className="font-[family-name:var(--font-playfair)] text-6xl md:text-8xl lg:text-9xl tracking-widest uppercase text-white mb-6">
-          Fantastick
+          HAO HUANG
         </h1>
         <p className="text-sm md:text-base tracking-[0.3em] uppercase text-white/60 mb-12">
           Fine Art Photography
@@ -34,7 +34,7 @@ export default function HomePage() {
           href="/gallery"
           className="border border-white/40 text-white/80 hover:border-white hover:text-white text-xs tracking-[0.3em] uppercase px-8 py-3 transition-all duration-300"
         >
-          View Gallery
+          View Portfolio
         </Link>
       </div>
 
