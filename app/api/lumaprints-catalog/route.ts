@@ -29,12 +29,12 @@ export async function GET(req: Request) {
     // Fetch full catalog
     const catalog = await fetchLumaprintsCatalog();
 
-    // Fetch options for our three frame subcategories
+    // Fetch options for our three frame subcategories + unframed
     const frameOptions = {
-      black_105005:    await getOptions(105005),
-      maple_105022:    await getOptions(105022),
-      espresso_105012: await getOptions(105012),
-      unframed_103001: await getOptions(103001),
+      black_105005:    await getOptions(105005), // 1.25in Black Frame
+      white_105006:    await getOptions(105006), // 1.25in White Frame
+      oak_105007:      await getOptions(105007), // 1.25in Oak Frame
+      unframed_103001: await getOptions(103001), // Archival Matte Fine Art Paper
     };
 
     return NextResponse.json({ catalog, frameOptions });

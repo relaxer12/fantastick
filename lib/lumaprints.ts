@@ -4,20 +4,21 @@ import { matSizeOptionIds } from './pricing';
 const LUMAPRINTS_BASE = 'https://us.api.lumaprints.com';
 const STORE_ID = 82920;
 
-// ─── Verified subcategoryIds from live catalog (2026-03-02) ──────────────────
+// ─── Subcategory IDs per Lumaprints Product Configuration docs ───────────────
+// https://api-docs.lumaprints.com/doc-420501
 // Print Only
 const SUBCATEGORY_ARCHIVAL_MATTE = 103001; // Archival Matte Fine Art Paper
 
-// Framed — each frame color is its own subcategory (max 60×40" each)
-const SUBCATEGORY_BLACK_FRAME   = 105005; // 1.25w x 0.875h Black Frame
-const SUBCATEGORY_MAPLE_FRAME   = 105022; // 1.25w x 0.875h Maple Wood Frame
-const SUBCATEGORY_ESPRESSO_FRAME = 105012; // 0.875w x 1.125h Espresso Frame
+// Framed Fine Art Paper — 1.25in frames (consistent depth across all colors)
+const SUBCATEGORY_BLACK_FRAME = 105005; // 1.25in Black Frame
+const SUBCATEGORY_WHITE_FRAME = 105006; // 1.25in White Frame
+const SUBCATEGORY_OAK_FRAME   = 105007; // 1.25in Oak Frame
 // ─────────────────────────────────────────────────────────────────────────────
 
 const framedSubcategoryMap: Record<FrameColor, number> = {
-  black:    SUBCATEGORY_BLACK_FRAME,
-  maple:    SUBCATEGORY_MAPLE_FRAME,
-  espresso: SUBCATEGORY_ESPRESSO_FRAME,
+  black: SUBCATEGORY_BLACK_FRAME,
+  white: SUBCATEGORY_WHITE_FRAME,
+  oak:   SUBCATEGORY_OAK_FRAME,
 };
 
 const sizeDimensions: Record<PrintSize, { width: number; height: number }> = {
@@ -83,19 +84,24 @@ export async function createLumaprintsOrder(
   const firstName = nameParts[0] || 'Customer';
   const lastName = nameParts.slice(1).join(' ') || '.';
 
-  const framedOptions = [
-    74,  // Paper Type: Archival Matte Fine Art Paper
-    matSizeOptionIds[matSize ?? 'none'], // Mat Size (default: No Mat)
-    ...(matSize && matSize !== 'none' ? [96] : []), // Mat Color: White (only when mat exists)
-    83,  // Hanging Hardware: Hanging Wire
-    95,  // Backing: Kraft Paper
-    146, // Glazing: Acrylic Glass (recommended)
-    149, // Print Mounting: Loose Mounted
-  ];
+  // orderItemOptions is required by the Lumaprints schema for all order items.
+  // Framed Fine Art Paper options per docs: Mat Size, Mat Color, Paper Type, Hanging Hardware, Backing.
+  // Options 146/149 (Glazing/Mount) are NOT in the documented catalog — omitted to prevent 400s.
+  const orderItemOptions: number[] = format === 'framed'
+    ? [
+        74,  // Paper Type: Archival Matte Fine Art Paper
+        matSizeOptionIds[matSize ?? 'none'], // Mat Size (64 = No Mat default)
+        ...(matSize && matSize !== 'none' ? [96] : []), // Mat Color: White (only when mat exists)
+        83,  // Hanging Hardware: Hanging Wire installed on frame
+        95,  // Backing: Kraft Paper
+      ]
+    : [
+        36,  // Fine Art Paper Bleed: 0.25in Bleed (default)
+      ];
 
   const payload = {
     externalId: externalOrderId,
-    storeId: String(STORE_ID),
+    storeId: STORE_ID, // number, not string — per API schema
     shippingMethod: 'default',
     productionTime: 'regular',
     recipient: {
@@ -107,7 +113,7 @@ export async function createLumaprintsOrder(
       state: shipping.state,
       zipCode: shipping.postal_code,
       country: shipping.country,
-      phone: '000-000-0000', // Stripe doesn't collect phone — placeholder
+      // phone is not required per Lumaprints RecipientDto schema — omitted
     },
     orderItems: [
       {
@@ -119,8 +125,7 @@ export async function createLumaprintsOrder(
         file: {
           imageUrl: photoUrl,
         },
-        // orderItemOptions — only relevant for framed prints
-        ...(format === 'framed' ? { orderItemOptions: framedOptions } : {}),
+        orderItemOptions, // required field per schema
       },
     ],
   };
@@ -139,7 +144,9 @@ export async function createLumaprintsOrder(
     throw new Error(`Lumaprints API error ${response.status}: ${errorText}`);
   }
 
-  return response.json() as Promise<LumaprintsOrderResponse>;
+  const result = await response.json() as LumaprintsOrderResponse;
+  console.log(`Lumaprints order created: orderNumber=${result.orderNumber} externalId=${externalOrderId}`);
+  return result;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

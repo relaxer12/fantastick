@@ -111,8 +111,8 @@ export default function PhotoDrawer({ photo, onClose }: PhotoDrawerProps) {
 
   const frameColorSwatches: Record<FrameColor, string> = {
     black: '#1a1a1a',
-    maple: '#c49a6c',
-    espresso: '#3b1e0e',
+    white: '#f5f5f0',
+    oak:   '#b8874a',
   };
 
   return (
