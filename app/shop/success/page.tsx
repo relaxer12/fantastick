@@ -21,7 +21,7 @@ export default function SuccessPage() {
         </p>
 
         <div className="border-t border-[#2a2a2a] pt-6 space-y-3 text-xs text-white/30 tracking-wide">
-          <p>Questions? Email <a href="mailto:hello@fantastick.work" className="text-white/50 hover:text-white transition-colors">hello@fantastick.work</a></p>
+          <p>Questions? Email <a href="mailto:hao.huang@hey.com" className="text-white/50 hover:text-white transition-colors">hao.huang@hey.com</a></p>
         </div>
 
         <div className="mt-10">
