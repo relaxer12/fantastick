@@ -28,18 +28,24 @@ export async function POST(req: NextRequest) {
     const session = event.data.object as Stripe.Checkout.Session;
 
     try {
-      const { photoTitle, photoSrc, size, format, frameColor, matSize } = session.metadata as {
+      const { photoTitle, photoSrc: rawPhotoSrc, size, format, frameColor, matSize } = session.metadata as {
         photoId: string;
         photoTitle: string;
-        photoSrc: string;
+        photoSrc: string; // may be bare R2 key (legacy) or full URL
         size: PrintSize;
         format: PrintFormat;
         frameColor: string;
         matSize: string;
       };
 
+      // Normalise photoSrc — legacy orders stored bare R2 key; new orders store full URL
+      const R2_BASE = 'https://pub-426ed2c6f024444c8b80fb544d13a890.r2.dev';
+      const photoSrc = rawPhotoSrc.startsWith('https://') ? rawPhotoSrc : `${R2_BASE}/${rawPhotoSrc}`;
+
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const shipping = (session as any).shipping_details as { name?: string; address?: Stripe.Address } | null;
+      const sessionAny = session as any;
+      // Stripe moved shipping to collected_information in newer API versions — check both
+      const shipping = (sessionAny.collected_information?.shipping_details ?? sessionAny.shipping_details) as { name?: string; address?: Stripe.Address } | null;
 
       if (!shipping?.address) {
         console.error('No shipping address on completed session:', session.id);
