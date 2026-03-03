@@ -79,7 +79,7 @@ export default function PhotoDrawer({ photo, onClose }: PhotoDrawerProps) {
         body: JSON.stringify({
           photoId: photo.id,
           photoTitle: photo.title,
-          photoSrc: photo.publicId,
+          photoSrc: r2Url(photo.publicId),
           size,
           format,
           frameColor: format === 'framed' ? frameColor : undefined,
