@@ -62,7 +62,7 @@ export function getLumaprintsOrderItemOptions(
     ];
   }
 
-  return [36]; // Fine Art Paper bleed: 0.25in (default)
+  return [39]; // Fine Art Paper bleed: No Bleed (keeps exact ordered aspect ratio)
 }
 
 export async function createLumaprintsOrder(
