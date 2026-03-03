@@ -29,26 +29,26 @@ export default function AboutPage() {
 
           <div className="space-y-5 text-white/70 leading-relaxed text-sm">
             <p>
-              I&apos;m a photographer based in New York, drawn to scenes that hold more than they show — a street corner gone quiet, light falling across a face, architecture that makes you feel small in exactly the right way.
+              I&apos;m a photographer based in New York but travels the world, drawn to scenes that hold more than they show — a street corner gone quiet, light falling across a face, architecture that makes you feel small in exactly the right way.
             </p>
             <p>
               I&apos;ve been making photographs for twenty years, starting with a Canon my dad handed me in high school. That camera taught me to slow down and look. I&apos;m still doing the same thing.
             </p>
             <p>
-              My work moves across landscapes, streets, cities, and people. The subject changes; the question stays the same — what is this moment trying to say, and can I hold still long enough to hear it?
+              My work moves across landscapes, streets, cities, and sometimes people. The subject changes; the question stays the same — what is this moment trying to say, and can I hold still long enough to hear it?
             </p>
             <p>
-              Prints are produced on archival matte paper with a 100-year color guarantee. Every order is fulfilled by Lumaprints, a professional fine art print lab, and shipped directly to you.
+              If you are all so kind to order prints, rest assured they are produced on archival matte paper with a 100-year color guarantee. Every order is fulfilled by Lumaprints, a professional fine art print lab, and shipped directly to you.
             </p>
           </div>
 
           <div className="mt-10 pt-8 border-t border-[#2a2a2a]">
             <p className="text-[10px] tracking-widest uppercase text-white/30 mb-4">Inquiries</p>
             <a
-              href="mailto:hello@fantastick.work"
+              href="mailto:hao.huang@hey.com"
               className="text-sm text-white/60 hover:text-white transition-colors"
             >
-              hello@fantastick.work
+              hao.huang@hey.com
             </a>
           </div>
 
