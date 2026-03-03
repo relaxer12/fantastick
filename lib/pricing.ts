@@ -4,6 +4,34 @@ export type FrameColor = 'black' | 'maple' | 'espresso';
 export type MatSize = 'none' | '1.0' | '1.5' | '2.0' | '2.5' | '3.0';
 
 export const printSizes: PrintSize[] = ['4x6', '5x7', '8x10', '11x14', '12x16', '16x20', '16x24'];
+
+// Normalised short/long ratio for each print size (orientation-independent)
+const printSizeRatios: Record<PrintSize, number> = {
+  '4x6':   4 / 6,   // 0.6667
+  '5x7':   5 / 7,   // 0.7143
+  '8x10':  8 / 10,  // 0.8000
+  '11x14': 11 / 14, // 0.7857
+  '12x16': 12 / 16, // 0.7500
+  '16x20': 16 / 20, // 0.8000
+  '16x24': 16 / 24, // 0.6667
+};
+
+/**
+ * Returns the print sizes compatible with a given photo aspect ratio.
+ * Uses the same 1% tolerance enforced by Lumaprints.
+ * Both portrait and landscape photos work — comparison is orientation-independent.
+ */
+export function getCompatibleSizes(photoAspectRatio: number): PrintSize[] {
+  // Normalise photo ratio to short/long (always ≤ 1)
+  const photoRatio = photoAspectRatio > 1
+    ? 1 / photoAspectRatio
+    : photoAspectRatio;
+
+  return printSizes.filter((size) => {
+    const diff = Math.abs(printSizeRatios[size] - photoRatio) / Math.max(printSizeRatios[size], photoRatio);
+    return diff <= 0.01; // 1% tolerance — matches Lumaprints requirement
+  });
+}
 export const matSizes: MatSize[] = ['none', '1.0', '1.5', '2.0', '2.5', '3.0'];
 
 export const matSizeLabels: Record<MatSize, string> = {

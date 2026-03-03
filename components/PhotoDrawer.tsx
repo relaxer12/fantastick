@@ -7,6 +7,7 @@ import type { Photo } from '@/data/photos';
 import { subcategoryLabels } from '@/data/photos';
 import {
   printSizes,
+  getCompatibleSizes,
   printSizeLabels,
   frameColors,
   frameColorLabels,
@@ -26,7 +27,9 @@ interface PhotoDrawerProps {
 }
 
 export default function PhotoDrawer({ photo, onClose }: PhotoDrawerProps) {
-  const [size, setSize] = useState<PrintSize>('8x10');
+  const compatibleSizes = photo ? getCompatibleSizes(photo.aspectRatio) : printSizes;
+  const defaultSize: PrintSize = (photo && getCompatibleSizes(photo.aspectRatio)[0]) ?? '8x10';
+  const [size, setSize] = useState<PrintSize>(defaultSize);
   const [format, setFormat] = useState<PrintFormat>('print');
   const [frameColor, setFrameColor] = useState<FrameColor>('black');
   const [matSize, setMatSize] = useState<MatSize>('none');
@@ -36,7 +39,7 @@ export default function PhotoDrawer({ photo, onClose }: PhotoDrawerProps) {
   // Reset selections when a new photo is opened
   useEffect(() => {
     if (photo) {
-      setSize('8x10');
+      setSize(getCompatibleSizes(photo.aspectRatio)[0] ?? '8x10');
       setFormat('print');
       setFrameColor('black');
       setMatSize('none');
@@ -174,8 +177,11 @@ export default function PhotoDrawer({ photo, onClose }: PhotoDrawerProps) {
           {/* Size selector */}
           <div>
             <label className="text-[10px] tracking-widest uppercase text-white/40 block mb-3">Size</label>
+            {compatibleSizes.length === 0 && (
+              <p className="text-xs text-white/40 tracking-wide">No standard print sizes match this image ratio. Contact us for a custom order.</p>
+            )}
             <div className="grid grid-cols-4 gap-2">
-              {printSizes.map((s) => (
+              {compatibleSizes.map((s) => (
                 <button
                   key={s}
                   onClick={() => setSize(s)}
