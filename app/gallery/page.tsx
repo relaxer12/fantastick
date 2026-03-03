@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import { cldThumb } from '@/lib/cloudinary';
 import Link from 'next/link';
 import { collections, collectionLabels, photos } from '@/data/photos';
 
@@ -28,7 +29,7 @@ export default function GalleryPage() {
             className="group relative aspect-[3/4] overflow-hidden block"
           >
             <Image
-              src={cover.thumbnailSrc}
+              src={cldThumb(cover.publicId)}
               alt={label}
               fill
               className="object-cover brightness-60 group-hover:brightness-75 transition-all duration-500 group-hover:scale-105"

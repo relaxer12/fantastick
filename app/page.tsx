@@ -1,20 +1,17 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { cldHero } from '@/lib/cloudinary';
 
-const heroImages = [
-  'https://picsum.photos/seed/hero1/1920/1080',
-  'https://picsum.photos/seed/hero2/1920/1080',
-  'https://picsum.photos/seed/hero3/1920/1080',
-];
+// REPLACE with your hero photo's Cloudinary public ID
+// e.g. 'landscapes/alpine-silence' or 'hero/my-best-shot'
+const heroPublicId = 'REPLACE_WITH_HERO_PUBLIC_ID';
 
 export default function HomePage() {
-  const hero = heroImages[0];
-
   return (
     <div className="relative h-screen w-full overflow-hidden">
       {/* Hero image */}
       <Image
-        src={hero}
+        src={cldHero(heroPublicId)}
         alt="Featured photograph"
         fill
         priority

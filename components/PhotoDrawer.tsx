@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
+import { cldThumb } from '@/lib/cloudinary';
 import type { Photo } from '@/data/photos';
 import {
   printSizes,
@@ -77,7 +78,7 @@ export default function PhotoDrawer({ photo, onClose }: PhotoDrawerProps) {
         body: JSON.stringify({
           photoId: photo.id,
           photoTitle: photo.title,
-          photoSrc: photo.src,
+          photoSrc: photo.publicId,
           size,
           format,
           frameColor: format === 'framed' ? frameColor : undefined,
@@ -138,7 +139,7 @@ export default function PhotoDrawer({ photo, onClose }: PhotoDrawerProps) {
         {/* Photo preview */}
         <div className="relative w-full aspect-[4/3] bg-[#0a0a0a] flex-shrink-0">
           <Image
-            src={photo.thumbnailSrc}
+            src={cldThumb(photo.publicId)}
             alt={photo.title}
             fill
             className="object-contain"

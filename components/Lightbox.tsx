@@ -2,6 +2,7 @@
 
 import { useEffect, useCallback } from 'react';
 import Image from 'next/image';
+import { cldFull } from '@/lib/cloudinary';
 import type { Photo } from '@/data/photos';
 
 interface LightboxProps {
@@ -67,7 +68,7 @@ export default function Lightbox({ photo, onClose, onBuyPrints }: LightboxProps)
         {/* Full image — object-contain so nothing is cropped */}
         <div className="relative w-full h-full">
           <Image
-            src={photo.src}
+            src={cldFull(photo.publicId)}
             alt={photo.title}
             fill
             className="object-contain"
