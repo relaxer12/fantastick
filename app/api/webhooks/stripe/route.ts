@@ -135,8 +135,6 @@ export async function POST(req: NextRequest) {
       const {
         photoTitle,
         photoSrc: rawPhotoSrc,
-        imageAspectRatio: rawImageAspectRatio,
-        photoAspectRatio: rawPhotoAspectRatio,
         size,
         format,
         cropMode,
@@ -146,8 +144,6 @@ export async function POST(req: NextRequest) {
         photoId: string;
         photoTitle: string;
         photoSrc: string; // may be bare R2 key (legacy) or full URL
-        imageAspectRatio?: string;
-        photoAspectRatio?: string; // legacy
         size: PrintSize;
         format: PrintFormat;
         cropMode?: string;
@@ -162,8 +158,6 @@ export async function POST(req: NextRequest) {
       // Normalise photoSrc — legacy orders stored bare R2 key; new orders store full URL
       const R2_BASE = 'https://pub-426ed2c6f024444c8b80fb544d13a890.r2.dev';
       const photoSrc = rawPhotoSrc.startsWith('https://') ? rawPhotoSrc : `${R2_BASE}/${rawPhotoSrc}`;
-      const aspectRaw = rawImageAspectRatio ?? rawPhotoAspectRatio;
-      const photoAspectRatio = aspectRaw ? Number(aspectRaw) : undefined;
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const sessionAny = session as any;
@@ -196,8 +190,7 @@ export async function POST(req: NextRequest) {
           format,
           frameColor ? (frameColor as FrameColor) : undefined,
           (matSize && matSize !== 'none') ? (matSize as MatSize) : undefined,
-          shippingAddress,
-          Number.isFinite(photoAspectRatio) ? photoAspectRatio : undefined
+          shippingAddress
         );
         orderNumber = orderRes.orderNumber;
         console.log(`Lumaprints order created for session ${session.id}: ${orderNumber}`);

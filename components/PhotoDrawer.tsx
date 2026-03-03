@@ -40,9 +40,22 @@ export default function PhotoDrawer({ photo, onClose }: PhotoDrawerProps) {
 
   const nativeSizes = photo ? getCompatibleSizes(photo.aspectRatio) : [];
 
+  const orientationMatchedNativeSizes = photo
+    ? nativeSizes.filter((s) => {
+        const d = sizeDimensions[s];
+        const isLandscapeSize = d.width > d.height;
+        const isPortraitSize = d.height > d.width;
+        const isSquareSize = d.width === d.height;
+
+        if (isSquareSize) return true;
+        if (photo.aspectRatio >= 1) return isLandscapeSize;
+        return isPortraitSize;
+      })
+    : [];
+
   useEffect(() => {
     if (photo) {
-      const defaultSize = nativeSizes[0] ?? '8x10';
+      const defaultSize = orientationMatchedNativeSizes[0] ?? nativeSizes[0] ?? '8x10';
       setSize(defaultSize);
       setFormat('print');
       setFrameColor('black');

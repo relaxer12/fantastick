@@ -72,17 +72,13 @@ export async function createLumaprintsOrder(
   format: PrintFormat,
   frameColor: FrameColor | undefined,
   matSize: MatSize | undefined,
-  shipping: ShippingAddress,
-  photoAspectRatio?: number
+  shipping: ShippingAddress
 ): Promise<LumaprintsOrderResponse> {
   const dims = sizeDimensions[size];
-  let width = dims.width;
-  let height = dims.height;
+  const width = dims.width;
+  const height = dims.height;
 
-  // Match ordered dimensions to image orientation to satisfy aspect checks.
-  if (photoAspectRatio && Number.isFinite(photoAspectRatio) && photoAspectRatio > 1 && width < height) {
-    [width, height] = [height, width];
-  }
+  // Keep width/height exactly as selected size (orientation explicit in PrintSize).
 
   const subcategoryId = getLumaprintsSubcategory(format, frameColor);
   const orderItemOptions = getLumaprintsOrderItemOptions(format, matSize);

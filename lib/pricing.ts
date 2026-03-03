@@ -1,6 +1,11 @@
 export type PrintSize =
+  // Portrait
   | '4x6' | '5x7' | '8x10' | '11x14' | '12x16' | '16x20' | '16x24'
   | '8x12' | '12x18' | '20x30'
+  // Landscape counterparts
+  | '6x4' | '7x5' | '10x8' | '14x11' | '16x12' | '20x16' | '24x16'
+  | '12x8' | '18x12' | '30x20'
+  // Square
   | '8x8' | '10x10' | '12x12' | '16x16';
 
 export type PrintFormat = 'print' | 'framed';
@@ -9,12 +14,18 @@ export type MatSize = 'none' | '1.0' | '1.5' | '2.0' | '2.5' | '3.0';
 export type CropMode = 'fill' | 'fit';
 
 export const printSizes: PrintSize[] = [
+  // Portrait
   '4x6', '5x7', '8x10', '11x14', '12x16', '16x20', '16x24',
   '8x12', '12x18', '20x30',
+  // Landscape
+  '6x4', '7x5', '10x8', '14x11', '16x12', '20x16', '24x16',
+  '12x8', '18x12', '30x20',
+  // Square
   '8x8', '10x10', '12x12', '16x16',
 ];
 
 export const sizeDimensions: Record<PrintSize, { width: number; height: number }> = {
+  // Portrait
   '4x6':   { width: 4,  height: 6 },
   '5x7':   { width: 5,  height: 7 },
   '8x10':  { width: 8,  height: 10 },
@@ -25,20 +36,34 @@ export const sizeDimensions: Record<PrintSize, { width: number; height: number }
   '8x12':  { width: 8,  height: 12 },
   '12x18': { width: 12, height: 18 },
   '20x30': { width: 20, height: 30 },
+
+  // Landscape
+  '6x4':   { width: 6,  height: 4 },
+  '7x5':   { width: 7,  height: 5 },
+  '10x8':  { width: 10, height: 8 },
+  '14x11': { width: 14, height: 11 },
+  '16x12': { width: 16, height: 12 },
+  '20x16': { width: 20, height: 16 },
+  '24x16': { width: 24, height: 16 },
+  '12x8':  { width: 12, height: 8 },
+  '18x12': { width: 18, height: 12 },
+  '30x20': { width: 30, height: 20 },
+
+  // Square
   '8x8':   { width: 8,  height: 8 },
   '10x10': { width: 10, height: 10 },
   '12x12': { width: 12, height: 12 },
   '16x16': { width: 16, height: 16 },
 };
 
-// Normalised short/long ratio for each print size (orientation-independent)
+// Normalized short/long ratio for each print size (orientation-independent)
 const printSizeRatios: Record<PrintSize, number> = Object.fromEntries(
   Object.entries(sizeDimensions).map(([size, d]) => [size, Math.min(d.width, d.height) / Math.max(d.width, d.height)])
 ) as Record<PrintSize, number>;
 
 /**
- * Returns the print sizes naturally compatible with a given photo aspect ratio
- * without cropping/padding. Uses Lumaprints 1% aspect tolerance.
+ * Returns print sizes that naturally match the photo ratio (no crop/border needed).
+ * Uses Lumaprints 1% aspect tolerance.
  */
 export function getCompatibleSizes(photoAspectRatio: number): PrintSize[] {
   const photoRatio = photoAspectRatio > 1 ? 1 / photoAspectRatio : photoAspectRatio;
@@ -60,7 +85,6 @@ export const matSizeLabels: Record<MatSize, string> = {
   '3.0': '3″ Mat',
 };
 
-// Lumaprints optionId for each mat size
 export const matSizeOptionIds: Record<MatSize, number> = {
   none:  64,
   '1.0': 65,
@@ -71,6 +95,7 @@ export const matSizeOptionIds: Record<MatSize, number> = {
 };
 
 export const printSizeLabels: Record<PrintSize, string> = {
+  // Portrait
   '4x6': '4 × 6"',
   '5x7': '5 × 7"',
   '8x10': '8 × 10"',
@@ -81,6 +106,20 @@ export const printSizeLabels: Record<PrintSize, string> = {
   '8x12': '8 × 12"',
   '12x18': '12 × 18"',
   '20x30': '20 × 30"',
+
+  // Landscape
+  '6x4': '6 × 4"',
+  '7x5': '7 × 5"',
+  '10x8': '10 × 8"',
+  '14x11': '14 × 11"',
+  '16x12': '16 × 12"',
+  '20x16': '20 × 16"',
+  '24x16': '24 × 16"',
+  '12x8': '12 × 8"',
+  '18x12': '18 × 12"',
+  '30x20': '30 × 20"',
+
+  // Square
   '8x8': '8 × 8"',
   '10x10': '10 × 10"',
   '12x12': '12 × 12"',
@@ -97,6 +136,7 @@ export const frameColorLabels: Record<FrameColor, string> = {
 
 // Base print prices (customer-facing)
 const printPrices: Record<PrintSize, number> = {
+  // Portrait
   '4x6': 18,
   '5x7': 28,
   '8x10': 45,
@@ -107,20 +147,32 @@ const printPrices: Record<PrintSize, number> = {
   '8x12': 55,
   '12x18': 95,
   '20x30': 180,
+
+  // Landscape (same as portrait counterparts)
+  '6x4': 18,
+  '7x5': 28,
+  '10x8': 45,
+  '14x11': 65,
+  '16x12': 80,
+  '20x16': 110,
+  '24x16': 135,
+  '12x8': 55,
+  '18x12': 95,
+  '30x20': 180,
+
+  // Square
   '8x8': 40,
   '10x10': 55,
   '12x12': 70,
   '16x16': 100,
 };
 
-// Frame add-on prices
 const frameAddonPrices: Record<FrameColor, number> = {
   black: 55,
   white: 65,
   oak:   65,
 };
 
-// Mat add-on prices (on top of frame price)
 export const matAddonPrices: Record<MatSize, number> = {
   none:  0,
   '1.0': 15,

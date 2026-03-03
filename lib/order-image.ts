@@ -26,12 +26,10 @@ function getR2Client() {
   });
 }
 
-function targetAspectForImage(size: PrintSize, sourceAspect: number): number {
+function targetAspectForImage(size: PrintSize): number {
   const { width, height } = sizeDimensions[size];
-  const shortLong = Math.min(width, height) / Math.max(width, height);
-
-  // keep orientation of the original photo
-  return sourceAspect >= 1 ? 1 / shortLong : shortLong;
+  // Respect selected orientation exactly (landscape or portrait).
+  return width / height;
 }
 
 export interface PreparedOrderImage {
@@ -65,7 +63,7 @@ export async function prepareOrderImage(
   const srcW = meta.width;
   const srcH = meta.height;
   const srcAspect = srcW / srcH;
-  const targetAspect = targetAspectForImage(size, srcAspect);
+  const targetAspect = targetAspectForImage(size);
 
   const diff = Math.abs(srcAspect - targetAspect) / Math.max(srcAspect, targetAspect);
 
