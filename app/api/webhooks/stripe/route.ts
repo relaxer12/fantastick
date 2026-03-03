@@ -1,8 +1,110 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe';
 import { createLumaprintsOrder } from '@/lib/lumaprints';
+import { Resend } from 'resend';
 import type { PrintSize, PrintFormat, FrameColor, MatSize } from '@/lib/pricing';
 import type Stripe from 'stripe';
+
+function getPaymentIntentId(session: Stripe.Checkout.Session): string | undefined {
+  if (!session.payment_intent) return undefined;
+  return typeof session.payment_intent === 'string'
+    ? session.payment_intent
+    : session.payment_intent.id;
+}
+
+async function wasConfirmationEmailSent(session: Stripe.Checkout.Session): Promise<boolean> {
+  const paymentIntentId = getPaymentIntentId(session);
+  if (!paymentIntentId) return false;
+
+  try {
+    const pi = await stripe.paymentIntents.retrieve(paymentIntentId);
+    return pi.metadata?.order_confirmation_email_sent === 'true';
+  } catch (err) {
+    console.warn('Unable to read payment intent metadata for email dedupe:', err);
+    return false;
+  }
+}
+
+async function markConfirmationEmailSent(session: Stripe.Checkout.Session, orderNumber?: string | number) {
+  const paymentIntentId = getPaymentIntentId(session);
+  if (!paymentIntentId) return;
+
+  try {
+    await stripe.paymentIntents.update(paymentIntentId, {
+      metadata: {
+        order_confirmation_email_sent: 'true',
+        ...(orderNumber ? { lumaprints_order_number: String(orderNumber) } : {}),
+      },
+    });
+  } catch (err) {
+    console.warn('Unable to persist email sent marker on payment intent:', err);
+  }
+}
+
+async function sendOrderConfirmationEmail(
+  session: Stripe.Checkout.Session,
+  details: {
+    photoTitle: string;
+    size: PrintSize;
+    format: PrintFormat;
+    cropMode?: string;
+    frameColor?: string;
+    matSize?: string;
+    orderNumber?: string | number;
+  }
+) {
+  const resendApiKey = process.env.RESEND_API_KEY;
+  if (!resendApiKey) {
+    console.warn('RESEND_API_KEY not set; skipping order confirmation email.');
+    return;
+  }
+
+  const toEmail = session.customer_details?.email || session.customer_email || undefined;
+  if (!toEmail) {
+    console.warn(`No customer email found for session ${session.id}; skipping order confirmation email.`);
+    return;
+  }
+
+  if (await wasConfirmationEmailSent(session)) {
+    console.log(`Order confirmation email already sent for session ${session.id}; skipping.`);
+    return;
+  }
+
+  const from = process.env.RESEND_FROM_EMAIL || 'orders@fantastick.work';
+  const resend = new Resend(resendApiKey);
+
+  const formatLabel = details.format === 'framed' ? 'Framed Print' : 'Print';
+  const cropLabel = details.cropMode === 'fit' ? 'Fit (with border if needed)' : 'Fill (cropped to fit)';
+
+  const lines = [
+    `Thanks for your order from FantaStic_k.Work.`,
+    '',
+    details.orderNumber ? `Lumaprints Order Number: ${details.orderNumber}` : '',
+    `Reference ID: ${session.id}`,
+    '',
+    'Order details:',
+    `• Photo: ${details.photoTitle}`,
+    `• Product: ${details.size} ${formatLabel}`,
+    details.format === 'framed' && details.frameColor ? `• Frame: ${details.frameColor}` : '',
+    details.format === 'framed' && details.matSize ? `• Mat: ${details.matSize}` : '',
+    `• Crop mode: ${cropLabel}`,
+    '',
+    'Your order has been sent to Lumaprints and is now in production queue.',
+    'You will receive another email when it ships with tracking details.',
+    '',
+    'Questions? Reply to this email or contact hao.huang@hey.com.',
+  ].filter(Boolean);
+
+  await resend.emails.send({
+    from,
+    to: [toEmail],
+    subject: `Order confirmed${details.orderNumber ? ` · #${details.orderNumber}` : ''}`,
+    text: lines.join('\n'),
+  });
+
+  await markConfirmationEmailSent(session, details.orderNumber);
+  console.log(`Order confirmation email sent to ${toEmail} for session ${session.id}`);
+}
 
 export async function POST(req: NextRequest) {
   const body = await req.text();
@@ -37,6 +139,7 @@ export async function POST(req: NextRequest) {
         photoAspectRatio: rawPhotoAspectRatio,
         size,
         format,
+        cropMode,
         frameColor,
         matSize,
       } = session.metadata as {
@@ -47,6 +150,7 @@ export async function POST(req: NextRequest) {
         photoAspectRatio?: string; // legacy
         size: PrintSize;
         format: PrintFormat;
+        cropMode?: string;
         frameColor: string;
         matSize: string;
       };
@@ -82,27 +186,48 @@ export async function POST(req: NextRequest) {
         country: shipping.address.country || 'US',
       };
 
-      await createLumaprintsOrder(
-        session.id,
-        photoSrc,
-        size,
-        format,
-        frameColor ? (frameColor as FrameColor) : undefined,
-        (matSize && matSize !== 'none') ? (matSize as MatSize) : undefined,
-        shippingAddress,
-        Number.isFinite(photoAspectRatio) ? photoAspectRatio : undefined
-      );
+      let orderNumber: string | number | undefined;
 
-      console.log(`Lumaprints order created for session ${session.id}`);
-    } catch (err) {
-      const msg = String(err);
+      try {
+        const orderRes = await createLumaprintsOrder(
+          session.id,
+          photoSrc,
+          size,
+          format,
+          frameColor ? (frameColor as FrameColor) : undefined,
+          (matSize && matSize !== 'none') ? (matSize as MatSize) : undefined,
+          shippingAddress,
+          Number.isFinite(photoAspectRatio) ? photoAspectRatio : undefined
+        );
+        orderNumber = orderRes.orderNumber;
+        console.log(`Lumaprints order created for session ${session.id}: ${orderNumber}`);
+      } catch (err) {
+        const msg = String(err);
 
-      // Idempotency: if order already exists in Lumaprints, treat as success.
-      if (msg.toLowerCase().includes('already exists')) {
-        console.warn('Lumaprints order already exists; acknowledging webhook as success.');
-        return NextResponse.json({ received: true, duplicate: true });
+        // Idempotency: if order already exists in Lumaprints, treat as success.
+        if (msg.toLowerCase().includes('already exists')) {
+          console.warn('Lumaprints order already exists; acknowledging webhook as success.');
+        } else {
+          throw err;
+        }
       }
 
+      // Best-effort customer confirmation email (do not fail fulfillment if email fails)
+      try {
+        await sendOrderConfirmationEmail(session, {
+          photoTitle,
+          size,
+          format,
+          cropMode,
+          frameColor: frameColor || undefined,
+          matSize: (matSize && matSize !== 'none') ? matSize : undefined,
+          orderNumber,
+        });
+      } catch (emailErr) {
+        console.error('Order confirmation email send failed:', emailErr);
+      }
+    } catch (err) {
+      const msg = String(err);
       console.error('Failed to create Lumaprints order:', err);
       // Return 5xx so Stripe retries automatically.
       return NextResponse.json({ error: 'Fulfillment failed', details: msg }, { status: 500 });
