@@ -30,11 +30,21 @@ export async function POST(req: NextRequest) {
     const session = event.data.object as Stripe.Checkout.Session;
 
     try {
-      const { photoTitle, photoSrc: rawPhotoSrc, photoAspectRatio: rawPhotoAspectRatio, size, format, frameColor, matSize } = session.metadata as {
+      const {
+        photoTitle,
+        photoSrc: rawPhotoSrc,
+        imageAspectRatio: rawImageAspectRatio,
+        photoAspectRatio: rawPhotoAspectRatio,
+        size,
+        format,
+        frameColor,
+        matSize,
+      } = session.metadata as {
         photoId: string;
         photoTitle: string;
         photoSrc: string; // may be bare R2 key (legacy) or full URL
-        photoAspectRatio?: string;
+        imageAspectRatio?: string;
+        photoAspectRatio?: string; // legacy
         size: PrintSize;
         format: PrintFormat;
         frameColor: string;
@@ -48,7 +58,8 @@ export async function POST(req: NextRequest) {
       // Normalise photoSrc — legacy orders stored bare R2 key; new orders store full URL
       const R2_BASE = 'https://pub-426ed2c6f024444c8b80fb544d13a890.r2.dev';
       const photoSrc = rawPhotoSrc.startsWith('https://') ? rawPhotoSrc : `${R2_BASE}/${rawPhotoSrc}`;
-      const photoAspectRatio = rawPhotoAspectRatio ? Number(rawPhotoAspectRatio) : undefined;
+      const aspectRaw = rawImageAspectRatio ?? rawPhotoAspectRatio;
+      const photoAspectRatio = aspectRaw ? Number(aspectRaw) : undefined;
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const sessionAny = session as any;

@@ -1,34 +1,20 @@
 import type { PrintSize, PrintFormat, FrameColor, MatSize } from './pricing';
-import { matSizeOptionIds } from './pricing';
+import { matSizeOptionIds, sizeDimensions } from './pricing';
 
 const LUMAPRINTS_BASE = 'https://us.api.lumaprints.com';
 const STORE_ID = 82920;
 
 // ─── Subcategory IDs per Lumaprints Product Configuration docs ───────────────
 // https://api-docs.lumaprints.com/doc-420501
-// Print Only
-const SUBCATEGORY_ARCHIVAL_MATTE = 103001; // Archival Matte Fine Art Paper
-
-// Framed Fine Art Paper — 1.25in frames (consistent depth across all colors)
-const SUBCATEGORY_BLACK_FRAME = 105005; // 1.25in Black Frame
-const SUBCATEGORY_WHITE_FRAME = 105006; // 1.25in White Frame
-const SUBCATEGORY_OAK_FRAME   = 105007; // 1.25in Oak Frame
-// ─────────────────────────────────────────────────────────────────────────────
+const SUBCATEGORY_ARCHIVAL_MATTE = 103001; // Print only
+const SUBCATEGORY_BLACK_FRAME = 105005; // 1.25in Black
+const SUBCATEGORY_WHITE_FRAME = 105006; // 1.25in White
+const SUBCATEGORY_OAK_FRAME   = 105007; // 1.25in Oak
 
 const framedSubcategoryMap: Record<FrameColor, number> = {
   black: SUBCATEGORY_BLACK_FRAME,
   white: SUBCATEGORY_WHITE_FRAME,
   oak:   SUBCATEGORY_OAK_FRAME,
-};
-
-const sizeDimensions: Record<PrintSize, { width: number; height: number }> = {
-  '4x6':   { width: 4,  height: 6 },
-  '5x7':   { width: 5,  height: 7 },
-  '8x10':  { width: 8,  height: 10 },
-  '11x14': { width: 11, height: 14 },
-  '12x16': { width: 12, height: 16 },
-  '16x20': { width: 16, height: 20 },
-  '16x24': { width: 16, height: 24 },
 };
 
 export interface ShippingAddress {
@@ -55,6 +41,30 @@ function getAuthHeader(): string {
   return `Basic ${Buffer.from(`${apiKey}:${apiSecret}`).toString('base64')}`;
 }
 
+export function getLumaprintsSubcategory(format: PrintFormat, frameColor?: FrameColor): number {
+  return format === 'framed' && frameColor
+    ? framedSubcategoryMap[frameColor]
+    : SUBCATEGORY_ARCHIVAL_MATTE;
+}
+
+export function getLumaprintsOrderItemOptions(
+  format: PrintFormat,
+  matSize: MatSize | undefined
+): number[] {
+  // orderItemOptions is required by OrderItemsDto schema for all order items.
+  if (format === 'framed') {
+    return [
+      74,  // Paper Type: Archival Matte
+      matSizeOptionIds[matSize ?? 'none'], // Mat size (64 = No Mat)
+      ...(matSize && matSize !== 'none' ? [96] : []), // Mat color white only if mat exists
+      83,  // Hanging wire
+      95,  // Kraft paper backing
+    ];
+  }
+
+  return [36]; // Fine Art Paper bleed: 0.25in (default)
+}
+
 export async function createLumaprintsOrder(
   externalOrderId: string,
   photoUrl: string,
@@ -69,39 +79,22 @@ export async function createLumaprintsOrder(
   let width = dims.width;
   let height = dims.height;
 
-  // Match ordered dimensions to image orientation to satisfy Lumaprints aspect checks.
+  // Match ordered dimensions to image orientation to satisfy aspect checks.
   if (photoAspectRatio && Number.isFinite(photoAspectRatio) && photoAspectRatio > 1 && width < height) {
     [width, height] = [height, width];
   }
 
-  const subcategoryId =
-    format === 'framed' && frameColor
-      ? framedSubcategoryMap[frameColor]
-      : SUBCATEGORY_ARCHIVAL_MATTE;
+  const subcategoryId = getLumaprintsSubcategory(format, frameColor);
+  const orderItemOptions = getLumaprintsOrderItemOptions(format, matSize);
 
   // Split full name into first / last
   const nameParts = shipping.name.trim().split(' ');
   const firstName = nameParts[0] || 'Customer';
   const lastName = nameParts.slice(1).join(' ') || '.';
 
-  // orderItemOptions is required by the Lumaprints schema for all order items.
-  // Framed Fine Art Paper options per docs: Mat Size, Mat Color, Paper Type, Hanging Hardware, Backing.
-  // Options 146/149 (Glazing/Mount) are NOT in the documented catalog — omitted to prevent 400s.
-  const orderItemOptions: number[] = format === 'framed'
-    ? [
-        74,  // Paper Type: Archival Matte Fine Art Paper
-        matSizeOptionIds[matSize ?? 'none'], // Mat Size (64 = No Mat default)
-        ...(matSize && matSize !== 'none' ? [96] : []), // Mat Color: White (only when mat exists)
-        83,  // Hanging Hardware: Hanging Wire installed on frame
-        95,  // Backing: Kraft Paper
-      ]
-    : [
-        36,  // Fine Art Paper Bleed: 0.25in Bleed (default)
-      ];
-
   const payload = {
     externalId: externalOrderId,
-    storeId: STORE_ID, // number, not string — per API schema
+    storeId: STORE_ID,
     shippingMethod: 'default',
     productionTime: 'regular',
     recipient: {
@@ -113,7 +106,6 @@ export async function createLumaprintsOrder(
       state: shipping.state,
       zipCode: shipping.postal_code,
       country: shipping.country,
-      // phone is not required per Lumaprints RecipientDto schema — omitted
     },
     orderItems: [
       {
@@ -125,7 +117,7 @@ export async function createLumaprintsOrder(
         file: {
           imageUrl: photoUrl,
         },
-        orderItemOptions, // required field per schema
+        orderItemOptions,
       },
     ],
   };
@@ -149,9 +141,6 @@ export async function createLumaprintsOrder(
   return result;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Catalog discovery — used by /api/lumaprints-catalog
-// ─────────────────────────────────────────────────────────────────────────────
 export async function fetchLumaprintsCatalog() {
   const auth = getAuthHeader();
 

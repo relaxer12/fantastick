@@ -1,37 +1,54 @@
-export type PrintSize = '4x6' | '5x7' | '8x10' | '11x14' | '12x16' | '16x20' | '16x24';
+export type PrintSize =
+  | '4x6' | '5x7' | '8x10' | '11x14' | '12x16' | '16x20' | '16x24'
+  | '8x12' | '12x18' | '20x30'
+  | '8x8' | '10x10' | '12x12' | '16x16';
+
 export type PrintFormat = 'print' | 'framed';
 export type FrameColor = 'black' | 'white' | 'oak';
 export type MatSize = 'none' | '1.0' | '1.5' | '2.0' | '2.5' | '3.0';
+export type CropMode = 'fill' | 'fit';
 
-export const printSizes: PrintSize[] = ['4x6', '5x7', '8x10', '11x14', '12x16', '16x20', '16x24'];
+export const printSizes: PrintSize[] = [
+  '4x6', '5x7', '8x10', '11x14', '12x16', '16x20', '16x24',
+  '8x12', '12x18', '20x30',
+  '8x8', '10x10', '12x12', '16x16',
+];
 
-// Normalised short/long ratio for each print size (orientation-independent)
-const printSizeRatios: Record<PrintSize, number> = {
-  '4x6':   4 / 6,   // 0.6667
-  '5x7':   5 / 7,   // 0.7143
-  '8x10':  8 / 10,  // 0.8000
-  '11x14': 11 / 14, // 0.7857
-  '12x16': 12 / 16, // 0.7500
-  '16x20': 16 / 20, // 0.8000
-  '16x24': 16 / 24, // 0.6667
+export const sizeDimensions: Record<PrintSize, { width: number; height: number }> = {
+  '4x6':   { width: 4,  height: 6 },
+  '5x7':   { width: 5,  height: 7 },
+  '8x10':  { width: 8,  height: 10 },
+  '11x14': { width: 11, height: 14 },
+  '12x16': { width: 12, height: 16 },
+  '16x20': { width: 16, height: 20 },
+  '16x24': { width: 16, height: 24 },
+  '8x12':  { width: 8,  height: 12 },
+  '12x18': { width: 12, height: 18 },
+  '20x30': { width: 20, height: 30 },
+  '8x8':   { width: 8,  height: 8 },
+  '10x10': { width: 10, height: 10 },
+  '12x12': { width: 12, height: 12 },
+  '16x16': { width: 16, height: 16 },
 };
 
+// Normalised short/long ratio for each print size (orientation-independent)
+const printSizeRatios: Record<PrintSize, number> = Object.fromEntries(
+  Object.entries(sizeDimensions).map(([size, d]) => [size, Math.min(d.width, d.height) / Math.max(d.width, d.height)])
+) as Record<PrintSize, number>;
+
 /**
- * Returns the print sizes compatible with a given photo aspect ratio.
- * Uses the same 1% tolerance enforced by Lumaprints.
- * Both portrait and landscape photos work — comparison is orientation-independent.
+ * Returns the print sizes naturally compatible with a given photo aspect ratio
+ * without cropping/padding. Uses Lumaprints 1% aspect tolerance.
  */
 export function getCompatibleSizes(photoAspectRatio: number): PrintSize[] {
-  // Normalise photo ratio to short/long (always ≤ 1)
-  const photoRatio = photoAspectRatio > 1
-    ? 1 / photoAspectRatio
-    : photoAspectRatio;
+  const photoRatio = photoAspectRatio > 1 ? 1 / photoAspectRatio : photoAspectRatio;
 
   return printSizes.filter((size) => {
     const diff = Math.abs(printSizeRatios[size] - photoRatio) / Math.max(printSizeRatios[size], photoRatio);
-    return diff <= 0.01; // 1% tolerance — matches Lumaprints requirement
+    return diff <= 0.01;
   });
 }
+
 export const matSizes: MatSize[] = ['none', '1.0', '1.5', '2.0', '2.5', '3.0'];
 
 export const matSizeLabels: Record<MatSize, string> = {
@@ -43,7 +60,7 @@ export const matSizeLabels: Record<MatSize, string> = {
   '3.0': '3″ Mat',
 };
 
-// Lumaprints optionId for each mat size (same across all frame subcategories)
+// Lumaprints optionId for each mat size
 export const matSizeOptionIds: Record<MatSize, number> = {
   none:  64,
   '1.0': 65,
@@ -61,6 +78,13 @@ export const printSizeLabels: Record<PrintSize, string> = {
   '12x16': '12 × 16"',
   '16x20': '16 × 20"',
   '16x24': '16 × 24"',
+  '8x12': '8 × 12"',
+  '12x18': '12 × 18"',
+  '20x30': '20 × 30"',
+  '8x8': '8 × 8"',
+  '10x10': '10 × 10"',
+  '12x12': '12 × 12"',
+  '16x16': '16 × 16"',
 };
 
 export const frameColors: FrameColor[] = ['black', 'white', 'oak'];
@@ -80,9 +104,16 @@ const printPrices: Record<PrintSize, number> = {
   '12x16': 80,
   '16x20': 110,
   '16x24': 135,
+  '8x12': 55,
+  '12x18': 95,
+  '20x30': 180,
+  '8x8': 40,
+  '10x10': 55,
+  '12x12': 70,
+  '16x16': 100,
 };
 
-// Frame add-on prices (Black = standard; White/Oak = premium)
+// Frame add-on prices
 const frameAddonPrices: Record<FrameColor, number> = {
   black: 55,
   white: 65,
