@@ -61,9 +61,17 @@ export async function createLumaprintsOrder(
   format: PrintFormat,
   frameColor: FrameColor | undefined,
   matSize: MatSize | undefined,
-  shipping: ShippingAddress
+  shipping: ShippingAddress,
+  photoAspectRatio?: number
 ): Promise<LumaprintsOrderResponse> {
-  const { width, height } = sizeDimensions[size];
+  const dims = sizeDimensions[size];
+  let width = dims.width;
+  let height = dims.height;
+
+  // Match ordered dimensions to image orientation to satisfy Lumaprints aspect checks.
+  if (photoAspectRatio && Number.isFinite(photoAspectRatio) && photoAspectRatio > 1 && width < height) {
+    [width, height] = [height, width];
+  }
 
   const subcategoryId =
     format === 'framed' && frameColor
@@ -74,6 +82,16 @@ export async function createLumaprintsOrder(
   const nameParts = shipping.name.trim().split(' ');
   const firstName = nameParts[0] || 'Customer';
   const lastName = nameParts.slice(1).join(' ') || '.';
+
+  const framedOptions = [
+    74,  // Paper Type: Archival Matte Fine Art Paper
+    matSizeOptionIds[matSize ?? 'none'], // Mat Size (default: No Mat)
+    ...(matSize && matSize !== 'none' ? [96] : []), // Mat Color: White (only when mat exists)
+    83,  // Hanging Hardware: Hanging Wire
+    95,  // Backing: Kraft Paper
+    146, // Glazing: Acrylic Glass (recommended)
+    149, // Print Mounting: Loose Mounted
+  ];
 
   const payload = {
     externalId: externalOrderId,
@@ -101,19 +119,8 @@ export async function createLumaprintsOrder(
         file: {
           imageUrl: photoUrl,
         },
-        solidColorHexCode: null,
         // orderItemOptions — only relevant for framed prints
-        ...(format === 'framed' ? {
-          orderItemOptions: [
-            74,  // Paper Type: Archival Matte Fine Art Paper
-            matSizeOptionIds[matSize ?? 'none'], // Mat Size (default: No Mat)
-            96,  // Mat Color: White (only used when mat size > none)
-            83,  // Hanging Hardware: Hanging Wire
-            95,  // Backing: Kraft Paper
-            146, // Glazing: Acrylic Glass (recommended)
-            149, // Print Mounting: Loose Mounted
-          ],
-        } : {}),
+        ...(format === 'framed' ? { orderItemOptions: framedOptions } : {}),
       },
     ],
   };

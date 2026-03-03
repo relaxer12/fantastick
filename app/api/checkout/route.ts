@@ -1,15 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe';
-import { getPriceInCents, getShippingInCents, printSizeLabels, frameColorLabels, matSizeLabels } from '@/lib/pricing';
+import { r2Url } from '@/lib/r2';
+import { getPhotoById } from '@/data/photos';
+import {
+  getPriceInCents,
+  getShippingInCents,
+  printSizeLabels,
+  frameColorLabels,
+  matSizeLabels,
+  getCompatibleSizes,
+} from '@/lib/pricing';
 import type { PrintSize, PrintFormat, FrameColor, MatSize } from '@/lib/pricing';
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { photoId, photoTitle, photoSrc, size, format, frameColor, matSize } = body as {
+    const { photoId, size, format, frameColor, matSize } = body as {
       photoId: string;
-      photoTitle: string;
-      photoSrc: string;
       size: PrintSize;
       format: PrintFormat;
       frameColor?: FrameColor;
@@ -19,6 +26,31 @@ export async function POST(req: NextRequest) {
     if (!photoId || !size || !format) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
+
+    const photo = getPhotoById(photoId);
+    if (!photo) {
+      return NextResponse.json({ error: 'Invalid photoId' }, { status: 400 });
+    }
+
+    if (format === 'framed' && !frameColor) {
+      return NextResponse.json({ error: 'frameColor is required for framed prints' }, { status: 400 });
+    }
+
+    // Server-side guard: only allow print sizes that Lumaprints will accept.
+    const compatibleSizes = getCompatibleSizes(photo.aspectRatio);
+    if (!compatibleSizes.includes(size)) {
+      return NextResponse.json(
+        {
+          error: `Selected size ${size} is not compatible with this photo's aspect ratio`,
+          compatibleSizes,
+        },
+        { status: 400 }
+      );
+    }
+
+    const photoTitle = photo.title;
+    const photoSrc = r2Url(photo.publicId);
+    const photoAspectRatio = photo.aspectRatio;
 
     const printAmountCents = getPriceInCents(size, format, frameColor, matSize);
     const shippingCents = getShippingInCents();
@@ -63,6 +95,7 @@ export async function POST(req: NextRequest) {
         photoId,
         photoTitle,
         photoSrc,
+        photoAspectRatio: String(photoAspectRatio),
         size,
         format,
         frameColor: frameColor || '',

@@ -15,9 +15,11 @@ export async function POST(req: NextRequest) {
   try {
     if (webhookSecret && sig) {
       event = stripe.webhooks.constructEvent(body, sig, webhookSecret);
-    } else {
-      // During development without webhook secret — parse directly
+    } else if (process.env.NODE_ENV !== 'production') {
+      // Local development fallback only
       event = JSON.parse(body) as Stripe.Event;
+    } else {
+      throw new Error('Missing STRIPE_WEBHOOK_SECRET or stripe-signature header in production');
     }
   } catch (err) {
     console.error('Webhook signature verification failed:', err);
@@ -28,19 +30,25 @@ export async function POST(req: NextRequest) {
     const session = event.data.object as Stripe.Checkout.Session;
 
     try {
-      const { photoTitle, photoSrc: rawPhotoSrc, size, format, frameColor, matSize } = session.metadata as {
+      const { photoTitle, photoSrc: rawPhotoSrc, photoAspectRatio: rawPhotoAspectRatio, size, format, frameColor, matSize } = session.metadata as {
         photoId: string;
         photoTitle: string;
         photoSrc: string; // may be bare R2 key (legacy) or full URL
+        photoAspectRatio?: string;
         size: PrintSize;
         format: PrintFormat;
         frameColor: string;
         matSize: string;
       };
 
+      if (!rawPhotoSrc) {
+        throw new Error('Missing photoSrc in Stripe metadata');
+      }
+
       // Normalise photoSrc — legacy orders stored bare R2 key; new orders store full URL
       const R2_BASE = 'https://pub-426ed2c6f024444c8b80fb544d13a890.r2.dev';
       const photoSrc = rawPhotoSrc.startsWith('https://') ? rawPhotoSrc : `${R2_BASE}/${rawPhotoSrc}`;
+      const photoAspectRatio = rawPhotoAspectRatio ? Number(rawPhotoAspectRatio) : undefined;
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const sessionAny = session as any;
@@ -69,14 +77,15 @@ export async function POST(req: NextRequest) {
         format,
         frameColor ? (frameColor as FrameColor) : undefined,
         (matSize && matSize !== 'none') ? (matSize as MatSize) : undefined,
-        shippingAddress
+        shippingAddress,
+        Number.isFinite(photoAspectRatio) ? photoAspectRatio : undefined
       );
 
       console.log(`Lumaprints order created for session ${session.id}`);
     } catch (err) {
       console.error('Failed to create Lumaprints order:', err);
-      // Return 200 so Stripe doesn't retry — log and handle manually
-      return NextResponse.json({ error: 'Fulfillment failed', details: String(err) }, { status: 200 });
+      // Return 5xx so Stripe retries automatically.
+      return NextResponse.json({ error: 'Fulfillment failed', details: String(err) }, { status: 500 });
     }
   }
 

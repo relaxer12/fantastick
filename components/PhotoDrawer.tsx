@@ -72,6 +72,11 @@ export default function PhotoDrawer({ photo, onClose }: PhotoDrawerProps) {
 
   const handleBuyNow = useCallback(async () => {
     if (!photo) return;
+    if (compatibleSizes.length === 0) {
+      setError('This photo needs a custom print size. Please contact us.');
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
@@ -81,8 +86,6 @@ export default function PhotoDrawer({ photo, onClose }: PhotoDrawerProps) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           photoId: photo.id,
-          photoTitle: photo.title,
-          photoSrc: r2Url(photo.publicId),
           size,
           format,
           frameColor: format === 'framed' ? frameColor : undefined,
@@ -101,7 +104,7 @@ export default function PhotoDrawer({ photo, onClose }: PhotoDrawerProps) {
       setError(err instanceof Error ? err.message : 'Something went wrong');
       setLoading(false);
     }
-  }, [photo, size, format, frameColor]);
+  }, [photo, size, format, frameColor, matSize, compatibleSizes.length]);
 
   if (!photo) return null;
 
@@ -284,7 +287,7 @@ export default function PhotoDrawer({ photo, onClose }: PhotoDrawerProps) {
           {/* Buy button */}
           <button
             onClick={handleBuyNow}
-            disabled={loading}
+            disabled={loading || compatibleSizes.length === 0}
             className="w-full py-4 bg-white text-black text-xs tracking-[0.25em] uppercase font-medium hover:bg-white/90 active:bg-white/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? 'Redirecting…' : 'Buy Now'}
