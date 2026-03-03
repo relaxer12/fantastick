@@ -57,7 +57,8 @@ export async function POST(req: NextRequest) {
 
       if (!shipping?.address) {
         console.error('No shipping address on completed session:', session.id);
-        return NextResponse.json({ error: 'No shipping address' }, { status: 400 });
+        // 5xx so Stripe retries instead of dropping fulfillment permanently.
+        return NextResponse.json({ error: 'No shipping address' }, { status: 500 });
       }
 
       const shippingAddress = {

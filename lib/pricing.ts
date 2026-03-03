@@ -90,7 +90,7 @@ const frameAddonPrices: Record<FrameColor, number> = {
 };
 
 // Mat add-on prices (on top of frame price)
-const matAddonPrices: Record<MatSize, number> = {
+export const matAddonPrices: Record<MatSize, number> = {
   none:  0,
   '1.0': 15,
   '1.5': 18,

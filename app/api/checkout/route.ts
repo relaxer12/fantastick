@@ -9,6 +9,9 @@ import {
   frameColorLabels,
   matSizeLabels,
   getCompatibleSizes,
+  printSizes,
+  frameColors,
+  matSizes,
 } from '@/lib/pricing';
 import type { PrintSize, PrintFormat, FrameColor, MatSize } from '@/lib/pricing';
 
@@ -25,6 +28,23 @@ export async function POST(req: NextRequest) {
 
     if (!photoId || !size || !format) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    }
+
+    const VALID_FORMATS: PrintFormat[] = ['print', 'framed'];
+    if (!VALID_FORMATS.includes(format)) {
+      return NextResponse.json({ error: 'Invalid format' }, { status: 400 });
+    }
+
+    if (!printSizes.includes(size)) {
+      return NextResponse.json({ error: 'Invalid size' }, { status: 400 });
+    }
+
+    if (frameColor !== undefined && !frameColors.includes(frameColor)) {
+      return NextResponse.json({ error: 'Invalid frameColor' }, { status: 400 });
+    }
+
+    if (matSize !== undefined && !matSizes.includes(matSize)) {
+      return NextResponse.json({ error: 'Invalid matSize' }, { status: 400 });
     }
 
     const photo = getPhotoById(photoId);

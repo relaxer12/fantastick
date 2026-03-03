@@ -13,6 +13,7 @@ import {
   frameColorLabels,
   matSizes,
   matSizeLabels,
+  matAddonPrices,
   getPrice,
   SHIPPING_PRICE,
   type PrintSize,
@@ -245,7 +246,7 @@ export default function PhotoDrawer({ photo, onClose }: PhotoDrawerProps) {
                   >
                     {matSizeLabels[m]}
                     {m !== 'none' && (
-                      <span className="block text-[9px] text-white/30 mt-0.5">+${[15,18,22,25,28][['1.0','1.5','2.0','2.5','3.0'].indexOf(m)]}</span>
+                      <span className="block text-[9px] text-white/30 mt-0.5">+${matAddonPrices[m]}</span>
                     )}
                   </button>
                 ))}
