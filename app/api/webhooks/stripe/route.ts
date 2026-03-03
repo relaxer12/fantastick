@@ -95,9 +95,17 @@ export async function POST(req: NextRequest) {
 
       console.log(`Lumaprints order created for session ${session.id}`);
     } catch (err) {
+      const msg = String(err);
+
+      // Idempotency: if order already exists in Lumaprints, treat as success.
+      if (msg.toLowerCase().includes('already exists')) {
+        console.warn('Lumaprints order already exists; acknowledging webhook as success.');
+        return NextResponse.json({ received: true, duplicate: true });
+      }
+
       console.error('Failed to create Lumaprints order:', err);
       // Return 5xx so Stripe retries automatically.
-      return NextResponse.json({ error: 'Fulfillment failed', details: String(err) }, { status: 500 });
+      return NextResponse.json({ error: 'Fulfillment failed', details: msg }, { status: 500 });
     }
   }
 
