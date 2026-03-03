@@ -35,12 +35,27 @@ interface LumaprintsShippingEvent {
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json() as LumaprintsShippingEvent;
+    const raw = await req.text();
+
+    // Lumaprints webhook URL verification may send an empty/non-JSON body.
+    // Return 200 so endpoint verification succeeds.
+    if (!raw || raw.trim() === '') {
+      return NextResponse.json({ received: true, verification: true });
+    }
+
+    let body: Partial<LumaprintsShippingEvent>;
+    try {
+      body = JSON.parse(raw) as Partial<LumaprintsShippingEvent>;
+    } catch {
+      // Be permissive during provider verification probes.
+      return NextResponse.json({ received: true, verification: true });
+    }
 
     const { orderNumber, externalId, shipments } = body;
 
+    // If this isn't a full shipping payload, acknowledge anyway.
     if (!orderNumber || !externalId) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+      return NextResponse.json({ received: true, verification: true });
     }
 
     // Log the shipping event for tracking/audit
@@ -63,6 +78,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ received: true });
   } catch (err) {
     console.error('Lumaprints webhook error:', err);
-    return NextResponse.json({ error: 'Webhook processing failed' }, { status: 500 });
+    // Keep 200 on unexpected errors so Lumaprints endpoint checks don't fail.
+    return NextResponse.json({ received: true, error: 'Webhook processing failed' });
   }
 }
