@@ -2,8 +2,9 @@
 
 import { useEffect, useCallback } from 'react';
 import Image from 'next/image';
-import { cldFull } from '@/lib/cloudinary';
+import { r2Url } from '@/lib/r2';
 import type { Photo } from '@/data/photos';
+import { subcategoryLabels } from '@/data/photos';
 
 interface LightboxProps {
   photo: Photo | null;
@@ -47,7 +48,7 @@ export default function Lightbox({ photo, onClose, onBuyPrints }: LightboxProps)
       <div className="flex items-center justify-between px-6 py-4 flex-shrink-0" onClick={(e) => e.stopPropagation()}>
         <div>
           <p className="font-[family-name:var(--font-playfair)] text-white text-lg">{photo.title}</p>
-          <p className="text-xs tracking-widest uppercase text-white/30 mt-0.5 capitalize">{photo.collection}</p>
+          <p className="text-xs tracking-widest uppercase text-white/30 mt-0.5">{subcategoryLabels[photo.subcategory]}</p>
         </div>
         <button
           onClick={onClose}
@@ -68,7 +69,7 @@ export default function Lightbox({ photo, onClose, onBuyPrints }: LightboxProps)
         {/* Full image — object-contain so nothing is cropped */}
         <div className="relative w-full h-full">
           <Image
-            src={cldFull(photo.publicId)}
+            src={r2Url(photo.publicId)}
             alt={photo.title}
             fill
             className="object-contain"

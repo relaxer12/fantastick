@@ -4,6 +4,11 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
+        hostname: 'pub-426ed2c6f024444c8b80fb544d13a890.r2.dev',
+      },
+      // Legacy — remove once all placeholders are replaced
+      {
+        protocol: 'https',
         hostname: 'picsum.photos',
       },
       {

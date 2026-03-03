@@ -1,17 +1,15 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { cldHero } from '@/lib/cloudinary';
+import { r2Url } from '@/lib/r2';
 
-// REPLACE with your hero photo's Cloudinary public ID
-// e.g. 'landscapes/alpine-silence' or 'hero/my-best-shot'
-const heroPublicId = 'REPLACE_WITH_HERO_PUBLIC_ID';
+const heroKey = '35mm/35mm-1-17.jpg';
 
 export default function HomePage() {
   return (
     <div className="relative h-screen w-full overflow-hidden">
       {/* Hero image */}
       <Image
-        src={cldHero(heroPublicId)}
+        src={r2Url(heroKey)}
         alt="Featured photograph"
         fill
         priority

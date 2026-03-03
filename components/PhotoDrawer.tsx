@@ -2,8 +2,9 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
-import { cldThumb } from '@/lib/cloudinary';
+import { r2Url } from '@/lib/r2';
 import type { Photo } from '@/data/photos';
+import { subcategoryLabels } from '@/data/photos';
 import {
   printSizes,
   printSizeLabels,
@@ -123,7 +124,7 @@ export default function PhotoDrawer({ photo, onClose }: PhotoDrawerProps) {
         <div className="flex items-start justify-between p-6 border-b border-[#2a2a2a]">
           <div>
             <h3 className="font-[family-name:var(--font-playfair)] text-xl">{photo.title}</h3>
-            <p className="text-xs text-white/40 tracking-widest uppercase mt-1 capitalize">{photo.collection}</p>
+            <p className="text-xs text-white/40 tracking-widest uppercase mt-1">{subcategoryLabels[photo.subcategory]}</p>
           </div>
           <button
             onClick={onClose}
@@ -139,7 +140,7 @@ export default function PhotoDrawer({ photo, onClose }: PhotoDrawerProps) {
         {/* Photo preview */}
         <div className="relative w-full aspect-[4/3] bg-[#0a0a0a] flex-shrink-0">
           <Image
-            src={cldThumb(photo.publicId)}
+            src={r2Url(photo.publicId)}
             alt={photo.title}
             fill
             className="object-contain"

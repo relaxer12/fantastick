@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { cldThumb } from '@/lib/cloudinary';
+import { r2Url } from '@/lib/r2';
 import type { Photo } from '@/data/photos';
 import Lightbox from './Lightbox';
 import PhotoDrawer from './PhotoDrawer';
@@ -48,7 +48,7 @@ export default function PhotoGrid({ photos }: PhotoGridProps) {
               style={{ aspectRatio: photo.aspectRatio }}
             >
               <Image
-                src={cldThumb(photo.publicId)}
+                src={r2Url(photo.publicId)}
                 alt={photo.title}
                 fill
                 className="object-cover group-hover:brightness-110 transition-all duration-500 group-hover:scale-[1.02]"
