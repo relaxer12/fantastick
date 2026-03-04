@@ -34,7 +34,7 @@ export default function PhotoDrawer({ photo, onClose }: PhotoDrawerProps) {
   const [format, setFormat] = useState<PrintFormat>('print');
   const [frameColor, setFrameColor] = useState<FrameColor>('black');
   const [matSize, setMatSize] = useState<MatSize>('none');
-  const [cropMode, setCropMode] = useState<CropMode>('fill');
+  const cropMode: CropMode = 'fill';
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -60,7 +60,6 @@ export default function PhotoDrawer({ photo, onClose }: PhotoDrawerProps) {
       setFormat('print');
       setFrameColor('black');
       setMatSize('none');
-      setCropMode(nativeSizes.length > 0 ? 'fill' : 'fit');
       setError(null);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -136,7 +135,7 @@ export default function PhotoDrawer({ photo, onClose }: PhotoDrawerProps) {
     <>
       <div className="fixed inset-0 bg-black/70 z-40 backdrop-blur-sm" onClick={onClose} aria-hidden="true" />
 
-      <div className="fixed z-50 bottom-0 left-0 right-0 md:bottom-auto md:top-0 md:right-0 md:left-auto md:h-full md:w-[440px] bg-[#111111] border-t md:border-t-0 md:border-l border-[#2a2a2a] flex flex-col max-h-[90vh] md:max-h-full overflow-y-auto">
+      <div className="fixed z-50 bottom-0 left-0 right-0 md:bottom-auto md:top-0 md:right-0 md:left-auto md:h-full md:w-[600px] bg-[#111111] border-t md:border-t-0 md:border-l border-[#2a2a2a] flex flex-col max-h-[90vh] md:max-h-full overflow-y-auto">
         <div className="flex items-start justify-between p-6 border-b border-[#2a2a2a]">
           <div>
             <h3 className="font-[family-name:var(--font-playfair)] text-xl">{photo.title}</h3>
@@ -175,31 +174,15 @@ export default function PhotoDrawer({ photo, onClose }: PhotoDrawerProps) {
 
           <div>
             <label className="text-[10px] tracking-widest uppercase text-white/40 block mb-3">Crop Mode</label>
-            <div className="flex gap-2">
-              {(['fill', 'fit'] as CropMode[]).map((m) => (
-                <button
-                  key={m}
-                  onClick={() => setCropMode(m)}
-                  className={`flex-1 py-2.5 text-xs tracking-widest uppercase border transition-all ${
-                    cropMode === m
-                      ? 'border-white text-white bg-white/10'
-                      : 'border-[#333] text-white/50 hover:border-white/50 hover:text-white/80'
-                  }`}
-                >
-                  {m === 'fill' ? 'Fill (Crop)' : 'Fit (Border)'}
-                </button>
-              ))}
+            <div className="py-2.5 px-3 text-xs tracking-widest uppercase border border-white text-white bg-white/10">
+              Fill (Crop)
             </div>
-            <p className="text-[10px] text-white/30 mt-2 tracking-wide">
-              {cropMode === 'fill'
-                ? 'Crops to fill the print edge-to-edge.'
-                : 'Keeps the full image and adds white borders if needed.'}
-            </p>
+            <p className="text-[10px] text-white/30 mt-2 tracking-wide">Crops to fill the print edge-to-edge.</p>
           </div>
 
           <div>
             <label className="text-[10px] tracking-widest uppercase text-white/40 block mb-3">Size & Crop Preview</label>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 gap-3">
               {printSizes.map((s) => {
                 const dims = sizeDimensions[s];
                 const selected = size === s;
@@ -220,12 +203,12 @@ export default function PhotoDrawer({ photo, onClose }: PhotoDrawerProps) {
                         src={r2Url(photo.publicId)}
                         alt={`${photo.title} preview ${s}`}
                         fill
-                        className={cropMode === 'fill' ? 'object-cover' : 'object-contain bg-white'}
-                        sizes="120px"
+                        className="object-cover"
+                        sizes="180px"
                       />
                     </div>
                     <div className="mt-2 text-[10px] tracking-wider uppercase text-white/70">{s}&quot;</div>
-                    <div className="text-[9px] text-white/40">{native ? 'Native fit' : cropMode === 'fill' ? 'Will crop' : 'Will border'}</div>
+                    <div className="text-[9px] text-white/40">{native ? 'Native ratio' : 'Will crop'}</div>
                   </button>
                 );
               })}
@@ -285,7 +268,7 @@ export default function PhotoDrawer({ photo, onClose }: PhotoDrawerProps) {
             </div>
             {!isNativeSize && (
               <div className="text-[10px] text-white/35 mb-2 tracking-wide">
-                {cropMode === 'fill' ? 'This size will be cropped to match print ratio.' : 'This size will include white borders to preserve full image.'}
+                This size will be cropped to match print ratio.
               </div>
             )}
             {format === 'framed' && matSize !== 'none' && (
