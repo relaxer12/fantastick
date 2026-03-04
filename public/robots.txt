@@ -1,0 +1,12 @@
+# robots.txt — fantastick.work
+# Allow all well-behaved search crawlers on public pages.
+# API and internal routes are blocked.
+
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /_next/
+Disallow: /shop/success
+Disallow: /shop/cancel
+
+Sitemap: https://www.fantastick.work/sitemap.xml
