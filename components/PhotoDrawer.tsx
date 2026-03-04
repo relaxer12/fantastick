@@ -173,14 +173,6 @@ export default function PhotoDrawer({ photo, onClose }: PhotoDrawerProps) {
           </div>
 
           <div>
-            <label className="text-[10px] tracking-widest uppercase text-white/40 block mb-3">Crop Mode</label>
-            <div className="py-2.5 px-3 text-xs tracking-widest uppercase border border-white text-white bg-white/10">
-              Fill (Crop)
-            </div>
-            <p className="text-[10px] text-white/30 mt-2 tracking-wide">Crops to fill the print edge-to-edge.</p>
-          </div>
-
-          <div>
             <label className="text-[10px] tracking-widest uppercase text-white/40 block mb-3">Size & Crop Preview</label>
             <div className="grid grid-cols-2 gap-3">
               {printSizes.map((s) => {
