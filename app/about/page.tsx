@@ -1,4 +1,6 @@
+import Image from 'next/image';
 import Link from 'next/link';
+import { r2Url } from '@/lib/r2';
 
 export const metadata = {
   title: 'About — Fantastick',
@@ -9,9 +11,16 @@ export default function AboutPage() {
     <div className="min-h-screen pt-24 pb-16 px-6 md:px-12 max-w-4xl mx-auto">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-start">
 
-        {/* Portrait — replace bg-[#111] with your actual portrait once uploaded to R2 */}
-        <div className="relative aspect-[3/4] bg-[#111] flex items-end p-4">
-          <p className="text-[10px] tracking-widest uppercase text-white/20">Hao Huang</p>
+        {/* Portrait — MF No. 26 */}
+        <div className="relative aspect-[7/6] bg-[#111]">
+          <Image
+            src={r2Url('mf/MF-3-24.jpg')}
+            alt="Hao Huang — Photographer"
+            fill
+            className="object-cover"
+            sizes="(max-width: 768px) 100vw, 50vw"
+            priority
+          />
         </div>
 
         {/* Bio */}
