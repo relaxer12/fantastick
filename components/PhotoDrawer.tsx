@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { r2Url } from '@/lib/r2';
 import type { Photo } from '@/data/photos';
-import { subcategoryLabels } from '@/data/photos';
+import { categoryLabels } from '@/data/photos';
 import {
   printSizes,
   sizeDimensions,
@@ -139,7 +139,7 @@ export default function PhotoDrawer({ photo, onClose }: PhotoDrawerProps) {
         <div className="flex items-start justify-between p-6 border-b border-[#2a2a2a]">
           <div>
             <h3 className="font-[family-name:var(--font-playfair)] text-xl">{photo.title}</h3>
-            <p className="text-xs text-white/40 tracking-widest uppercase mt-1">{subcategoryLabels[photo.subcategory]}</p>
+            <p className="text-xs text-white/40 tracking-widest uppercase mt-1">{categoryLabels[photo.category]}</p>
           </div>
           <button onClick={onClose} className="text-white/40 hover:text-white transition-colors p-1 ml-4 mt-1 flex-shrink-0" aria-label="Close">
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none">

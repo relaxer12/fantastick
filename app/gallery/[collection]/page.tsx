@@ -1,17 +1,12 @@
 import { notFound } from 'next/navigation';
-import Image from 'next/image';
 import Link from 'next/link';
-import { r2Url } from '@/lib/r2';
 import {
   categories,
   categoryLabels,
-  subcategoryLabels,
-  filmSubcategories,
-  getCoverPhoto,
-  getPhotosBySubcategory,
+  getPhotosByCategory,
   type Category,
-  type Subcategory,
 } from '@/data/photos';
+import PhotoGrid from '@/components/PhotoGrid';
 
 interface PageProps {
   params: { collection: string };
@@ -44,56 +39,28 @@ export default function CategoryPage({ params }: PageProps) {
     );
   }
 
-  // Film — show subcategory cards
-  const subcatConfig = filmSubcategories.map((sub: Subcategory) => ({
-    sub,
-    label: subcategoryLabels[sub],
-    cover: getCoverPhoto(sub),
-    count: getPhotosBySubcategory(sub).length,
-  }));
+  // Film — show all photos directly
+  const catPhotos = getPhotosByCategory(cat);
 
   return (
-    <div className="min-h-screen pt-24 pb-16 px-6 md:px-12">
-      <header className="mb-12 md:mb-16">
-        <p className="text-xs tracking-widest uppercase text-white/40 mb-2">
-          <Link href="/gallery" className="hover:text-white/70 transition-colors">Gallery</Link>
-          {' / '}
-          <span>{categoryLabels[cat]}</span>
+    <div className="min-h-screen pt-24 pb-16 px-4 md:px-8 lg:px-12">
+      <header className="mb-10 md:mb-14 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+        <div>
+          <p className="text-xs tracking-widest uppercase text-white/40 mb-2">
+            <Link href="/gallery" className="hover:text-white/70 transition-colors">Gallery</Link>
+            {' / '}
+            <span>{categoryLabels[cat]}</span>
+          </p>
+          <h2 className="font-[family-name:var(--font-playfair)] text-4xl md:text-5xl">
+            {categoryLabels[cat]}
+          </h2>
+        </div>
+        <p className="text-xs tracking-widest uppercase text-white/40">
+          {catPhotos.length} photographs · Click to order a print
         </p>
-        <h2 className="font-[family-name:var(--font-playfair)] text-4xl md:text-5xl">
-          {categoryLabels[cat]}
-        </h2>
       </header>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {subcatConfig.map(({ sub, label, cover, count }) => (
-          <Link
-            key={sub}
-            href={`/gallery/${cat}/${sub}`}
-            className="group relative aspect-[3/4] md:aspect-[4/5] overflow-hidden block"
-          >
-            {cover ? (
-              <Image
-                src={r2Url(cover.publicId)}
-                alt={label}
-                fill
-                className="object-cover brightness-60 group-hover:brightness-75 transition-all duration-500 group-hover:scale-105"
-                sizes="(max-width: 768px) 100vw, 50vw"
-              />
-            ) : (
-              <div className="absolute inset-0 bg-[#111]" />
-            )}
-            <div className="absolute inset-0 flex flex-col items-center justify-end pb-10">
-              <h3 className="font-[family-name:var(--font-playfair)] text-3xl text-white tracking-wide">
-                {label}
-              </h3>
-              <p className="text-xs tracking-[0.3em] uppercase text-white/50 mt-2">
-                {count} prints
-              </p>
-            </div>
-          </Link>
-        ))}
-      </div>
+      <PhotoGrid photos={catPhotos} randomize />
     </div>
   );
 }

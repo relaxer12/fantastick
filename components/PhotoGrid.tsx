@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import Image from 'next/image';
 import { r2Url } from '@/lib/r2';
 import type { Photo } from '@/data/photos';
@@ -9,9 +9,20 @@ import PhotoDrawer from './PhotoDrawer';
 
 interface PhotoGridProps {
   photos: Photo[];
+  randomize?: boolean;
 }
 
-export default function PhotoGrid({ photos }: PhotoGridProps) {
+export default function PhotoGrid({ photos, randomize = false }: PhotoGridProps) {
+  const displayPhotos = useMemo(() => {
+    if (!randomize) return photos;
+    const arr = [...photos];
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }, [photos, randomize]);
+
   const [lightboxPhoto, setLightboxPhoto] = useState<Photo | null>(null);
   const [drawerPhoto, setDrawerPhoto] = useState<Photo | null>(null);
 
@@ -37,7 +48,7 @@ export default function PhotoGrid({ photos }: PhotoGridProps) {
     <>
       {/* Masonry grid */}
       <div className="columns-1 sm:columns-2 lg:columns-3 gap-3 space-y-3">
-        {photos.map((photo) => (
+        {displayPhotos.map((photo) => (
           <div
             key={photo.id}
             className="break-inside-avoid cursor-pointer group relative overflow-hidden"

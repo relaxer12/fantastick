@@ -7,8 +7,8 @@ const categoryConfig = [
   {
     slug: 'film',
     label: categoryLabels.film,
-    coverKey: getCoverPhoto('35mm')?.publicId ?? '',
-    desc: '35mm · Medium Format',
+    coverKey: getCoverPhoto('film')?.publicId ?? '',
+    desc: 'Film Photography',
   },
   {
     slug: 'digital',

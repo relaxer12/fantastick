@@ -4,7 +4,7 @@ import { useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { r2Url } from '@/lib/r2';
 import type { Photo } from '@/data/photos';
-import { subcategoryLabels } from '@/data/photos';
+import { categoryLabels } from '@/data/photos';
 
 interface LightboxProps {
   photo: Photo | null;
@@ -48,7 +48,7 @@ export default function Lightbox({ photo, onClose, onBuyPrints }: LightboxProps)
       <div className="flex items-center justify-between px-6 py-4 flex-shrink-0" onClick={(e) => e.stopPropagation()}>
         <div>
           <p className="font-[family-name:var(--font-playfair)] text-white text-lg">{photo.title}</p>
-          <p className="text-xs tracking-widest uppercase text-white/30 mt-0.5">{subcategoryLabels[photo.subcategory]}</p>
+          <p className="text-xs tracking-widest uppercase text-white/30 mt-0.5">{categoryLabels[photo.category]}</p>
         </div>
         <button
           onClick={onClose}
