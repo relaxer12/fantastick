@@ -49,6 +49,50 @@ function trackingUrl(carrier?: string, trackingNumber?: string): string | null {
   return null;
 }
 
+/**
+ * Validate the incoming request against LUMAPRINTS_WEBHOOK_SECRET.
+ *
+ * Lumaprints lets you configure a custom token in the dashboard
+ * (Developer → Webhook → Token). When set, LP sends it as:
+ *   Authorization: Bearer <token>
+ *
+ * If LUMAPRINTS_WEBHOOK_SECRET is not configured we log a warning and
+ * skip validation (backward-compatible until the env var is set).
+ *
+ * @param req - Incoming Next.js request
+ * @param isVerificationPing - Skip auth for empty verification pings (LP sends
+ *   these before real events to confirm the endpoint URL is reachable)
+ */
+function validateLumaprintsAuth(req: NextRequest, isVerificationPing: boolean): boolean {
+  const secret = process.env.LUMAPRINTS_WEBHOOK_SECRET;
+
+  if (!secret) {
+    // Not configured yet — warn but allow through so existing behaviour is unchanged
+    if (!isVerificationPing) {
+      console.warn(
+        '[lumaprints-webhook] LUMAPRINTS_WEBHOOK_SECRET is not set. ' +
+        'Set it in Vercel env vars and your Lumaprints dashboard to enable webhook auth.'
+      );
+    }
+    return true;
+  }
+
+  // Allow LP endpoint verification pings through without auth
+  if (isVerificationPing) return true;
+
+  // Check Authorization: Bearer <secret>
+  const authHeader = req.headers.get('authorization') ?? '';
+  const bearerToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : authHeader;
+  if (bearerToken && bearerToken === secret) return true;
+
+  // Fallback: check ?token= query param (some LP configurations use this)
+  const url = new URL(req.url);
+  const queryToken = url.searchParams.get('token') ?? '';
+  if (queryToken && queryToken === secret) return true;
+
+  return false;
+}
+
 export async function POST(req: NextRequest) {
   try {
     const raw = await req.text();
@@ -56,6 +100,12 @@ export async function POST(req: NextRequest) {
     // Lumaprints endpoint verification may POST empty/non-JSON body.
     if (!raw || raw.trim() === '') {
       return NextResponse.json({ received: true, verification: true });
+    }
+
+    // Authenticate after the empty-body check so LP verification pings always succeed
+    if (!validateLumaprintsAuth(req, false)) {
+      console.warn('[lumaprints-webhook] Rejected request: invalid or missing auth token');
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     let body: Partial<LumaprintsShippingEvent>;
