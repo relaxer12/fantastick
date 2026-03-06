@@ -126,9 +126,12 @@ export default function PhotoDrawer({ photo, onClose }: PhotoDrawerProps) {
   if (!photo) return null;
 
   const frameColorSwatches: Record<FrameColor, string> = {
-    black: '#1a1a1a',
-    white: '#f5f5f0',
-    oak: '#b8874a',
+    black:          '#1a1a1a',
+    white:          '#f5f5f0',
+    oak:            '#b8874a',
+    'natural-wood': '#d4a869',
+    gold:           '#c9a227',
+    espresso:       '#3d1e0e',
   };
 
   return (

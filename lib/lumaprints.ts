@@ -6,15 +6,21 @@ const STORE_ID = 82920;
 
 // ─── Subcategory IDs per Lumaprints Product Configuration docs ───────────────
 // https://api-docs.lumaprints.com/doc-420501
-const SUBCATEGORY_ARCHIVAL_MATTE = 103001; // Print only
-const SUBCATEGORY_BLACK_FRAME = 105005; // 1.25in Black
-const SUBCATEGORY_WHITE_FRAME = 105006; // 1.25in White
-const SUBCATEGORY_OAK_FRAME   = 105007; // 1.25in Oak
+const SUBCATEGORY_ARCHIVAL_MATTE  = 103001; // Print only
+const SUBCATEGORY_BLACK_FRAME     = 105005; // 1.25w × 0.875h Black
+const SUBCATEGORY_WHITE_FRAME     = 105006; // 1.25w × 0.875h White
+const SUBCATEGORY_OAK_FRAME       = 105007; // 1.25w × 0.875h Oak
+const SUBCATEGORY_NATURAL_WOOD    = 105008; // 0.875w × 1.125h Natural Wood
+const SUBCATEGORY_GOLD_FRAME      = 105011; // 0.875w × 1.125h Gold
+const SUBCATEGORY_ESPRESSO_FRAME  = 105012; // 0.875w × 1.125h Espresso
 
 const framedSubcategoryMap: Record<FrameColor, number> = {
-  black: SUBCATEGORY_BLACK_FRAME,
-  white: SUBCATEGORY_WHITE_FRAME,
-  oak:   SUBCATEGORY_OAK_FRAME,
+  black:          SUBCATEGORY_BLACK_FRAME,
+  white:          SUBCATEGORY_WHITE_FRAME,
+  oak:            SUBCATEGORY_OAK_FRAME,
+  'natural-wood': SUBCATEGORY_NATURAL_WOOD,
+  gold:           SUBCATEGORY_GOLD_FRAME,
+  espresso:       SUBCATEGORY_ESPRESSO_FRAME,
 };
 
 export interface ShippingAddress {

@@ -9,7 +9,7 @@ export type PrintSize =
   | '8x8' | '10x10' | '12x12' | '16x16';
 
 export type PrintFormat = 'print' | 'framed';
-export type FrameColor = 'black' | 'white' | 'oak';
+export type FrameColor = 'black' | 'white' | 'oak' | 'natural-wood' | 'gold' | 'espresso';
 export type MatSize = 'none' | '1.0' | '1.5' | '2.0' | '2.5' | '3.0';
 export type CropMode = 'fill' | 'fit';
 
@@ -126,12 +126,15 @@ export const printSizeLabels: Record<PrintSize, string> = {
   '16x16': '16 × 16"',
 };
 
-export const frameColors: FrameColor[] = ['black', 'white', 'oak'];
+export const frameColors: FrameColor[] = ['black', 'white', 'oak', 'natural-wood', 'gold', 'espresso'];
 
 export const frameColorLabels: Record<FrameColor, string> = {
-  black: 'Black',
-  white: 'White',
-  oak:   'Oak',
+  black:        'Black',
+  white:        'White',
+  oak:          'Oak',
+  'natural-wood': 'Natural Wood',
+  gold:         'Gold',
+  espresso:     'Espresso',
 };
 
 // Base print prices (customer-facing)
@@ -168,9 +171,12 @@ const printPrices: Record<PrintSize, number> = {
 };
 
 const frameAddonPrices: Record<FrameColor, number> = {
-  black: 55,
-  white: 65,
-  oak:   65,
+  black:          55,
+  white:          65,
+  oak:            65,
+  'natural-wood': 65,
+  gold:           75,  // premium finish
+  espresso:       65,
 };
 
 export const matAddonPrices: Record<MatSize, number> = {
