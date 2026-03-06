@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Inter, Playfair_Display } from 'next/font/google';
+import { Analytics } from '@vercel/analytics/next';
 import './globals.css';
 import Nav from '@/components/Nav';
 
@@ -37,6 +38,7 @@ export default function RootLayout({
       <body className="min-h-screen bg-[#0a0a0a] text-white">
         <Nav />
         <main>{children}</main>
+        <Analytics />
       </body>
     </html>
   );
