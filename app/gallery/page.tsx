@@ -13,8 +13,8 @@ const categoryConfig = [
   {
     slug: 'digital',
     label: categoryLabels.digital,
-    coverKey: null,
-    desc: 'Coming soon',
+    coverKey: getCoverPhoto('digital')?.publicId ?? '',
+    desc: 'Digital Photography',
   },
 ];
 

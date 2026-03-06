@@ -29,17 +29,6 @@ export default function CategoryPage({ params }: PageProps) {
   const cat = params.collection as Category;
   if (!categories.includes(cat)) notFound();
 
-  // Digital — coming soon
-  if (cat === 'digital') {
-    return (
-      <div className="min-h-screen pt-24 pb-16 px-6 md:px-12 flex flex-col items-center justify-center text-center">
-        <h2 className="font-[family-name:var(--font-playfair)] text-4xl md:text-5xl mb-4">Digital</h2>
-        <p className="text-sm tracking-widest uppercase text-white/40">Coming soon</p>
-      </div>
-    );
-  }
-
-  // Film — show all photos directly
   const catPhotos = getPhotosByCategory(cat);
 
   return (
