@@ -13,7 +13,7 @@ const categoryConfig = [
   {
     slug: 'digital',
     label: categoryLabels.digital,
-    coverKey: getCoverPhoto('digital')?.publicId ?? '',
+    coverKey: 'digital/X2D_0069.jpg', // No. 57 — hand-picked cover
     desc: 'Digital Photography',
   },
 ];
