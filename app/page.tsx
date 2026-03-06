@@ -6,18 +6,18 @@ import PhotoGrid from '@/components/PhotoGrid';
 
 const heroKey = '35mm/35mm-1-17.jpg';
 
-// Atlas-curated top 10 — updated as portfolio grows
+// Atlas-curated top 10 — film + digital mix (updated after digital portfolio added)
 const featuredIds = [
-  's-16',    // Concrete structure + folding chair
-  's-27',    // Man dining alone
-  'mf-3-20', // Woman on bench vs trellis wall
-  's-15',    // Concrete corridor to tree
-  'mf-3-47', // Log barns in snow
-  's-22',    // Liberty Street NYC golden hour
-  'mf-3-45', // Abandoned Karmann Ghia wide
-  's-18',    // Concrete ceiling + curtain + light
-  'mf-3-9',  // Crumbling classical façade
-  's-20',    // Cowboy mannequins
+  'd-1',     // Digital No. 1  — opener/hero digital (landscape)
+  's-16',    // Film — Concrete structure + folding chair
+  'd-9',     // Digital No. 9  — portrait orientation
+  'mf-3-20', // Film — Woman on bench vs trellis wall
+  'd-52',    // Digital No. 49 — large-format detail (landscape)
+  's-15',    // Film — Concrete corridor to tree
+  'd-46',    // Digital No. 43 — portrait orientation
+  'mf-3-47', // Film — Log barns in snow
+  'd-27',    // Digital No. 27 — landscape
+  'mf-3-45', // Film — Abandoned Karmann Ghia wide
 ];
 
 const featuredPhotos = featuredIds
