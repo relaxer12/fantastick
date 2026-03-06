@@ -48,10 +48,19 @@ export async function prepareOrderImage(
   size: PrintSize,
   cropMode: CropMode,
 ): Promise<PreparedOrderImage> {
-  const originalUrl = r2Url(photoPublicId);
+  // Always use the full-resolution original for print orders.
+  // Web-display keys (e.g. "digital/X2D_0001.jpg") are compressed to 3000px @85%
+  // for fast browser loading. The originals/ prefix holds the uncompressed source
+  // files at full sensor resolution (up to ~11,656px for Hasselblad X2D).
+  const originalsUrl = r2Url(`originals/${photoPublicId}`);
+  const fallbackUrl  = r2Url(photoPublicId); // compressed web version as fallback
 
-  // fetch original image
-  const res = await fetch(originalUrl);
+  let res = await fetch(originalsUrl);
+  // If originals/ not yet populated (e.g. upload still in progress), fall back gracefully.
+  if (!res.ok) {
+    console.warn(`[order-image] originals not found for ${photoPublicId}, falling back to web version`);
+    res = await fetch(fallbackUrl);
+  }
   if (!res.ok) throw new Error(`Failed to fetch original image: ${res.status}`);
   const input = Buffer.from(await res.arrayBuffer());
 
@@ -67,10 +76,10 @@ export async function prepareOrderImage(
 
   const diff = Math.abs(srcAspect - targetAspect) / Math.max(srcAspect, targetAspect);
 
-  // already matches target ratio closely enough
+  // already matches target ratio closely enough — send full-res original directly
   if (diff <= 0.01) {
     return {
-      imageUrl: originalUrl,
+      imageUrl: res.url, // resolves to originals/ URL (or fallback web URL)
       imageAspectRatio: srcAspect,
       wasTransformed: false,
     };
