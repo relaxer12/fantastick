@@ -47,7 +47,7 @@ export default function Lightbox({ photo, onClose, onBuyPrints }: LightboxProps)
       {/* Top bar */}
       <div className="flex items-center justify-between px-6 py-4 flex-shrink-0" onClick={(e) => e.stopPropagation()}>
         <div>
-          <p className="font-[family-name:var(--font-playfair)] text-white text-lg">{photo.title}</p>
+          <p className="font-[family-name:var(--font-cormorant)] font-light tracking-wide text-white text-xl">{photo.title}</p>
           <p className="text-xs tracking-widest uppercase text-white/30 mt-0.5">{categoryLabels[photo.category]}</p>
         </div>
         <button

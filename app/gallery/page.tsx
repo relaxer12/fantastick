@@ -22,7 +22,7 @@ export default function GalleryPage() {
   return (
     <div className="min-h-screen pt-24 pb-16 px-6 md:px-12">
       <header className="mb-12 md:mb-16">
-        <h2 className="font-[family-name:var(--font-playfair)] text-4xl md:text-5xl mb-3">
+        <h2 className="font-[family-name:var(--font-cormorant)] text-4xl md:text-5xl font-light mb-3">
           Portfolio
         </h2>
         <p className="text-sm tracking-widest uppercase text-white/40">
@@ -42,17 +42,19 @@ export default function GalleryPage() {
                 src={r2Url(coverKey)}
                 alt={label}
                 fill
-                className="object-cover brightness-60 group-hover:brightness-75 transition-all duration-500 group-hover:scale-105"
+                className="object-cover transition-all duration-700 group-hover:scale-105"
                 sizes="(max-width: 768px) 100vw, 50vw"
               />
             ) : (
               <div className="absolute inset-0 bg-[#111]" />
             )}
+            {/* Gradient overlay — preserves photo tonal character */}
+            <div className="absolute inset-0 bg-gradient-to-b from-black/15 via-black/20 to-black/65 group-hover:to-black/50 transition-all duration-500" />
             <div className="absolute inset-0 flex flex-col items-center justify-end pb-10">
-              <h3 className="font-[family-name:var(--font-playfair)] text-3xl text-white tracking-wide">
+              <h3 className="font-[family-name:var(--font-cormorant)] text-3xl font-light text-white tracking-wide group-hover:text-[#b8956a] transition-colors duration-300">
                 {label}
               </h3>
-              <p className="text-xs tracking-[0.3em] uppercase text-white/50 mt-2">
+              <p className="text-[10px] tracking-[0.35em] uppercase text-white/50 mt-2">
                 {desc}
               </p>
             </div>

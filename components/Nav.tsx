@@ -18,12 +18,12 @@ export default function Nav() {
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 md:px-12 h-16
-        ${isHome ? 'bg-transparent' : 'bg-[#0a0a0a]/90 backdrop-blur-sm border-b border-[#1f1f1f]'}`}
+        ${isHome ? 'bg-transparent' : 'bg-[#08090d]/90 backdrop-blur-sm border-b border-[#1c1d22]'}`}
     >
       {/* Logo */}
       <Link
         href="/"
-        className="font-[family-name:var(--font-playfair)] text-xl tracking-widest uppercase hover:opacity-70 transition-opacity"
+        className="font-[family-name:var(--font-cormorant)] text-xl font-light tracking-widest uppercase hover:text-[#b8956a] transition-colors duration-300"
       >
         Fantastick
       </Link>
@@ -34,8 +34,8 @@ export default function Nav() {
           <Link
             key={link.href}
             href={link.href}
-            className={`text-sm tracking-widest uppercase transition-opacity hover:opacity-70 ${
-              pathname.startsWith(link.href) ? 'opacity-100' : 'opacity-50'
+            className={`text-sm tracking-widest uppercase transition-colors duration-300 hover:text-[#b8956a] ${
+              pathname.startsWith(link.href) ? 'text-white' : 'text-white/50'
             }`}
           >
             {link.label}
@@ -56,13 +56,13 @@ export default function Nav() {
 
       {/* Mobile menu */}
       {menuOpen && (
-        <div className="absolute top-16 left-0 right-0 bg-[#0a0a0a]/95 backdrop-blur-sm border-b border-[#1f1f1f] flex flex-col py-6 px-6 gap-6 md:hidden">
+        <div className="absolute top-16 left-0 right-0 bg-[#08090d]/95 backdrop-blur-sm border-b border-[#1c1d22] flex flex-col py-6 px-6 gap-6 md:hidden">
           {navLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}
               onClick={() => setMenuOpen(false)}
-              className="text-sm tracking-widest uppercase opacity-80 hover:opacity-100 transition-opacity"
+              className="text-sm tracking-widest uppercase text-white/80 hover:text-[#b8956a] transition-colors duration-300"
             >
               {link.label}
             </Link>

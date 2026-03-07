@@ -40,7 +40,7 @@ export default function CategoryPage({ params }: PageProps) {
             {' / '}
             <span>{categoryLabels[cat]}</span>
           </p>
-          <h2 className="font-[family-name:var(--font-playfair)] text-4xl md:text-5xl">
+          <h2 className="font-[family-name:var(--font-cormorant)] text-4xl md:text-5xl font-light">
             {categoryLabels[cat]}
           </h2>
         </div>

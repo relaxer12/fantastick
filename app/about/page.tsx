@@ -25,7 +25,7 @@ export default function AboutPage() {
 
         {/* Bio */}
         <div className="pt-2 md:pt-8">
-          <h2 className="font-[family-name:var(--font-playfair)] text-4xl md:text-5xl mb-8">
+          <h2 className="font-[family-name:var(--font-cormorant)] text-4xl md:text-5xl font-light mb-8">
             About
           </h2>
 

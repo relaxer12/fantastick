@@ -141,7 +141,7 @@ export default function PhotoDrawer({ photo, onClose }: PhotoDrawerProps) {
       <div className="fixed z-50 bottom-0 left-0 right-0 md:bottom-auto md:top-0 md:right-0 md:left-auto md:h-full md:w-[600px] bg-[#111111] border-t md:border-t-0 md:border-l border-[#2a2a2a] flex flex-col max-h-[90vh] md:max-h-full overflow-y-auto">
         <div className="flex items-start justify-between p-6 border-b border-[#2a2a2a]">
           <div>
-            <h3 className="font-[family-name:var(--font-playfair)] text-xl">{photo.title}</h3>
+            <h3 className="font-[family-name:var(--font-cormorant)] font-light tracking-wide text-xl">{photo.title}</h3>
             <p className="text-xs text-white/40 tracking-widest uppercase mt-1">{categoryLabels[photo.category]}</p>
           </div>
           <button onClick={onClose} className="text-white/40 hover:text-white transition-colors p-1 ml-4 mt-1 flex-shrink-0" aria-label="Close">

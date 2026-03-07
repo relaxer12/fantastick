@@ -34,37 +34,42 @@ export default function HomePage() {
           alt="Featured photograph"
           fill
           priority
-          className="object-cover brightness-50"
+          className="object-cover"
           sizes="100vw"
         />
 
-        <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-6">
-          <h1 className="font-[family-name:var(--font-playfair)] text-6xl md:text-8xl lg:text-9xl tracking-widest uppercase text-white mb-6">
-            HAO HUANG
+        {/* Gradient overlay — preserves tonal character of the photo,
+            darkens only where text needs to be legible */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/25 via-transparent to-black/75" />
+
+        {/* Editorial bottom-left positioning — quieter, more gallery-like */}
+        <div className="absolute bottom-14 left-8 md:left-16 z-10">
+          <h1 className="font-[family-name:var(--font-cormorant)] text-4xl md:text-5xl lg:text-6xl font-light tracking-[0.2em] uppercase text-white">
+            Hao Huang
           </h1>
-          <p className="text-sm md:text-base tracking-[0.3em] uppercase text-white/60 mb-12">
+          <p className="text-[10px] tracking-[0.45em] uppercase text-white/50 mt-3 mb-8">
             Fine Art Photography
           </p>
           <Link
             href="/gallery"
-            className="border border-white/40 text-white/80 hover:border-white hover:text-white text-xs tracking-[0.3em] uppercase px-8 py-3 transition-all duration-300"
+            className="inline-block border border-white/35 text-white/75 hover:border-[#b8956a] hover:text-[#b8956a] text-[10px] tracking-[0.3em] uppercase px-8 py-3 transition-all duration-500"
           >
             View Portfolio
           </Link>
         </div>
 
         {/* Scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2 opacity-40">
-          <span className="text-[10px] tracking-widest uppercase text-white">Scroll</span>
-          <div className="w-px h-8 bg-white/40 animate-pulse" />
+        <div className="absolute bottom-8 right-8 md:right-16 z-10 flex flex-col items-center gap-2 opacity-30">
+          <div className="w-px h-8 bg-white animate-pulse" />
+          <span className="text-[9px] tracking-widest uppercase text-white">Scroll</span>
         </div>
       </section>
 
       {/* ── Featured Work ────────────────────────────────────────────────── */}
-      <section className="py-20 px-4 md:px-8 lg:px-12 bg-[#0a0a0a]">
+      <section className="py-20 px-4 md:px-8 lg:px-12 bg-[#08090d]">
         <header className="mb-10 md:mb-14 text-center">
-          <p className="text-[10px] tracking-[0.4em] uppercase text-white/30 mb-3">Selected Work</p>
-          <h2 className="font-[family-name:var(--font-playfair)] text-3xl md:text-4xl">
+          <p className="text-[10px] tracking-[0.45em] uppercase text-white/25 mb-4">Selected Work</p>
+          <h2 className="font-[family-name:var(--font-cormorant)] text-3xl md:text-4xl font-light tracking-wide">
             Featured Photographs
           </h2>
         </header>
@@ -74,7 +79,7 @@ export default function HomePage() {
         <div className="mt-16 flex justify-center">
           <Link
             href="/gallery"
-            className="border border-white/40 text-white/70 hover:border-white hover:text-white text-xs tracking-[0.3em] uppercase px-10 py-4 transition-all duration-300"
+            className="border border-white/30 text-white/60 hover:border-[#b8956a] hover:text-[#b8956a] text-[10px] tracking-[0.3em] uppercase px-10 py-4 transition-all duration-500"
           >
             View Portfolio
           </Link>

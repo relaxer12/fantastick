@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Inter, Playfair_Display } from 'next/font/google';
+import { Inter, Cormorant_Garamond } from 'next/font/google';
 import { Analytics } from '@vercel/analytics/next';
 import './globals.css';
 import Nav from '@/components/Nav';
@@ -10,9 +10,11 @@ const inter = Inter({
   display: 'swap',
 });
 
-const playfair = Playfair_Display({
-  variable: '--font-playfair',
+const cormorant = Cormorant_Garamond({
+  variable: '--font-cormorant',
   subsets: ['latin'],
+  weight: ['300', '400', '600'],
+  style: ['normal', 'italic'],
   display: 'swap',
 });
 
@@ -34,8 +36,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${inter.variable} ${playfair.variable}`}>
-      <body className="min-h-screen bg-[#0a0a0a] text-white">
+    <html lang="en" className={`${inter.variable} ${cormorant.variable}`}>
+      <body className="min-h-screen bg-[#08090d] text-white">
         <Nav />
         <main>{children}</main>
         <Analytics />

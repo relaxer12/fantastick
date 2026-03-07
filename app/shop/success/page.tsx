@@ -15,7 +15,7 @@ export default function SuccessPage() {
           </svg>
         </div>
 
-        <h2 className="font-[family-name:var(--font-playfair)] text-4xl mb-4">Order Confirmed</h2>
+        <h2 className="font-[family-name:var(--font-cormorant)] text-4xl font-light mb-4">Order Confirmed</h2>
         <p className="text-white/50 text-sm leading-relaxed mb-8">
           Thank you for your purchase. Your print is now being prepared by Lumaprints and will be shipped directly to you. You&apos;ll receive a confirmation email shortly.
         </p>

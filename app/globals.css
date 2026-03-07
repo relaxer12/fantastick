@@ -3,10 +3,11 @@
 @tailwind utilities;
 
 :root {
-  --bg: #0a0a0a;
+  --bg: #08090d;          /* cool blue-black — echoes steel shadow tones in film/digital work */
   --fg: #ffffff;
-  --muted: #888888;
-  --border: #1f1f1f;
+  --muted: #7a7a75;       /* slightly warm-grey vs pure #888 */
+  --border: #1c1d22;      /* matches the cool-dark bg */
+  --accent: #b8956a;      /* muted brass — echoes alpenglow, rust, golden foliage */
 }
 
 html {
@@ -22,9 +23,21 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Film grain overlay — echoes organic texture of the photography */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+  background-size: 128px 128px;
+  opacity: 0.028;
+  pointer-events: none;
+  z-index: 9999;
+}
+
 /* Smooth page transitions */
 * {
-  transition-property: opacity, transform;
+  transition-property: opacity, transform, color, border-color;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -42,11 +55,11 @@ img {
   background: var(--bg);
 }
 ::-webkit-scrollbar-thumb {
-  background: #333;
+  background: #2a2b30;
   border-radius: 2px;
 }
 
 /* Selection */
 ::selection {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(184, 149, 106, 0.2);  /* accent-tinted selection */
 }

@@ -68,7 +68,7 @@ export default function PhotoGrid({ photos, randomize = false }: PhotoGridProps)
               {/* Hover overlay */}
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-300 flex items-end">
                 <div className="p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <p className="text-sm font-[family-name:var(--font-playfair)] text-white">{photo.title}</p>
+                  <p className="text-sm font-[family-name:var(--font-cormorant)] font-light tracking-wide text-white">{photo.title}</p>
                   <p className="text-[10px] tracking-widest uppercase text-white/50 mt-1">View</p>
                 </div>
               </div>

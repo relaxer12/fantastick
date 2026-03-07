@@ -8,7 +8,7 @@ export default function CancelPage() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center text-center px-6">
       <div className="max-w-md">
-        <h2 className="font-[family-name:var(--font-playfair)] text-4xl mb-4">Order Cancelled</h2>
+        <h2 className="font-[family-name:var(--font-cormorant)] text-4xl font-light mb-4">Order Cancelled</h2>
         <p className="text-white/50 text-sm leading-relaxed mb-8">
           Your order was not completed. No charge was made. Head back to the gallery whenever you&apos;re ready.
         </p>
