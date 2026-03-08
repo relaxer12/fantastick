@@ -11,11 +11,11 @@ const featuredIds = [
   'd-1',     // Digital No. 1  — opener/hero digital (landscape)
   's-16',    // Film — Concrete structure + folding chair
   'd-9',     // Digital No. 9  — portrait orientation
-  'mf-3-20', // Film — Woman on bench vs trellis wall
+  'mf-3-47', // Film No. 49 — from Film tile
   'd-52',    // Digital No. 49 — large-format detail (landscape)
   's-15',    // Film — Concrete corridor to tree
   'd-46',    // Digital No. 43 — portrait orientation
-  'mf-3-47', // Film — Log barns in snow
+  'mf-3-20', // Film — Woman on bench vs trellis wall
   'd-27',    // Digital No. 27 — landscape
   'mf-3-45', // Film — Abandoned Karmann Ghia wide
 ];
