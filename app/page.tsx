@@ -15,7 +15,7 @@ const featuredIds = [
   'd-52',    // Digital No. 49 — large-format detail (landscape)
   's-15',    // Film — Concrete corridor to tree
   'd-46',    // Digital No. 43 — portrait orientation
-  'mf-3-20', // Film — Woman on bench vs trellis wall
+  'mf-3-46', // Film No. 48 — replaces No. 22 bench shot
   'd-27',    // Digital No. 27 — landscape
   'mf-3-45', // Film — Abandoned Karmann Ghia wide
 ];
