@@ -166,7 +166,6 @@ export const photos: Photo[] = [
   { id: 'd-36', title: 'No. 34', category: 'digital', publicId: 'digital/X2D_0036.jpg', aspectRatio: 1.3333 },
   { id: 'd-37', title: 'No. 35', category: 'digital', publicId: 'digital/X2D_0037.jpg', aspectRatio: 1.3333 },
   { id: 'd-38', title: 'No. 36', category: 'digital', publicId: 'digital/X2D_0038.jpg', aspectRatio: 1.3333 },
-  { id: 'd-39', title: 'No. 37', category: 'digital', publicId: 'digital/X2D_0039.jpg', aspectRatio: 1.3333 },
   { id: 'd-40', title: 'No. 38', category: 'digital', publicId: 'digital/X2D_0040.jpg', aspectRatio: 1.3334 },
   { id: 'd-41', title: 'No. 39', category: 'digital', publicId: 'digital/X2D_0041.jpg', aspectRatio: 1.2727 },
   { id: 'd-42', title: 'No. 40', category: 'digital', publicId: 'digital/X2D_0042.jpg', aspectRatio: 1.3334 },
